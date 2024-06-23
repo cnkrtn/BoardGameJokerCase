@@ -1,10 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
-public class GridManager : MonoBehaviour
+public class GridManager : Singleton<GridManager>
 {
     public enum GridSize { Small, Medium }
 
+    [Range(0, 100)]
+    public float percentageToFill;
+    
     public GridSize gridSize;
     public GameObject gridCellPrefab;
     public GameObject pathPrefab; // Reference to the new prefab
@@ -19,7 +23,7 @@ public class GridManager : MonoBehaviour
     private int unwalkableSize;
     private int connectionCount = 0;
     
-    private Dictionary<Vector2Int, GameObject> gridCells;
+    public Dictionary<Vector2Int, GameObject> gridCells;
     public List<Vector2Int> waypoints, modifiedWaypoints, finalPathTiles;
     public List<GameObject> finalPathGameObjects;
 
@@ -38,6 +42,53 @@ public class GridManager : MonoBehaviour
         FindPathsBetweenWaypoints();
         AssignPathTileIndices();
         GameObjectList();
+        SetBoardElements();
+    }
+
+    private void SetBoardElements()
+    {
+        finalPathGameObjects[0].GetComponent<GridObject>().isStartTile = true;
+        finalPathGameObjects[0].GetComponent<GridObject>().isEmptyTile = false;
+        for (int i = 1; i < waypoints.Count; i++)
+        {
+            var tileObject = GetGameObjectAtGridPosition(waypoints[i]);
+            tileObject.GetComponent<GridObject>().isSpecialTile = true;
+            tileObject.GetComponent<GridObject>().isEmptyTile = false;
+        }
+
+        var tileCount = finalPathTiles.Count - waypoints.Count;
+        var tilesToFill = Mathf.RoundToInt((percentageToFill / 100) * tileCount);
+        var emptyTiles = tileCount - tilesToFill;
+        var tilesToModify = (from tile in finalPathTiles where !waypoints.Contains(tile) select GetGameObjectAtGridPosition(tile)).ToList();
+        
+        
+        // Shuffle the tilesToModify list to randomize selection
+        tilesToModify = tilesToModify.OrderBy(x => Random.value).ToList();
+
+       
+        for (int i = 0; i < tilesToFill; i++)
+        {
+            var tileObject = tilesToModify[i].GetComponent<GridObject>();
+            var option = Random.Range(0, 3); 
+
+            switch (option)
+            {
+                case 0:
+                    tileObject.isAppleTile = true;
+                    tileObject.isEmptyTile = false;
+                    break;
+                case 1:
+                    tileObject.isPearTile = true;
+                    tileObject.isEmptyTile = false;
+                    break;
+                case 2:
+                    tileObject.isStrawberryTile = true;
+                    tileObject.isEmptyTile = false;
+                    break;
+            }
+        }
+        
+        EventManager.OnTileConfigurationEnd?.Invoke();
     }
 
     private void GameObjectList()
@@ -65,6 +116,8 @@ public class GridManager : MonoBehaviour
         {
             gameObject.transform.parent = finalPath;
         }
+        
+      
     }
 
     void SetGridSize()
@@ -242,8 +295,8 @@ public class GridManager : MonoBehaviour
             if (gridObject != null)
             {
                 gridObject.walkable = true;
-                GameObject pathObject = Instantiate(pathPrefab, cell.transform.position, Quaternion.identity, cell.transform);
-                pathObject.GetComponent<Renderer>().material.color = Color.green;
+                // GameObject pathObject = Instantiate(pathPrefab, cell.transform.position, Quaternion.identity, cell.transform);
+                // pathObject.GetComponent<Renderer>().material.color = Color.green;
             }
         }
 
@@ -275,7 +328,7 @@ public class GridManager : MonoBehaviour
                     {
                         GridObject gridObject = cell.GetComponent<GridObject>();
                         gridObject.walkable = false;
-                        Instantiate(pathPrefab, cell.transform.position, Quaternion.identity, cell.transform);
+                         //Instantiate(pathPrefab, cell.transform.position, Quaternion.identity, cell.transform);
                     }
                 }
             }
@@ -331,15 +384,27 @@ public class GridManager : MonoBehaviour
     for (int i = 0; i < finalPathTiles.Count; i++)
     {
         Vector2Int currentPos = finalPathTiles[i];
-        Vector2Int? prevPos = i > 0 ? finalPathTiles[i - 1] : (Vector2Int?)null;
-        Vector2Int? nextPos = i < finalPathTiles.Count - 1 ? finalPathTiles[i + 1] : (Vector2Int?)null;
+        Vector2Int? prevPos;
+        Vector2Int? nextPos;
+
+        // Handle the looping case
+        if (createSquarePath)
+        {
+            prevPos = i > 0 ? finalPathTiles[i - 1] : finalPathTiles[finalPathTiles.Count - 1];
+            nextPos = i < finalPathTiles.Count - 1 ? finalPathTiles[i + 1] : finalPathTiles[0];
+        }
+        else
+        {
+            prevPos = i > 0 ? finalPathTiles[i - 1] : (Vector2Int?)null;
+            nextPos = i < finalPathTiles.Count - 1 ? finalPathTiles[i + 1] : (Vector2Int?)null;
+        }
 
         var gameObject = GetGameObjectAtGridPosition(currentPos);
         int pathTileIndex = -1;
 
-        if (i == 0)
+        if (i == 0 && !createSquarePath)
         {
-            pathTileIndex = 5; // First element
+            pathTileIndex = 5; // First element if not a loop
         }
         else if (prevPos.HasValue && nextPos.HasValue)
         {
@@ -397,6 +462,7 @@ public class GridManager : MonoBehaviour
         }
     }
 }
+
 
 
 
