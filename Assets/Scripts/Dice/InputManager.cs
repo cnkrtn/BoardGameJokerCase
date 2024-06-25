@@ -6,33 +6,72 @@ using UnityEngine.UI;
 public class InputManager : MonoBehaviour
 {
     public DiceManager2 diceManager;
-    public TMP_InputField diceInputField;
-    public Button setFaceButton;
+    public TMP_Dropdown diceAmountDropdown;
+    public List<TMP_InputField> targetResultInputFields;
+    [SerializeField] private List<GameObject> dicePanels;
+    [SerializeField] private RectTransform foregroundWoodDicePanelParent, backgroundWoodDicePanelParent;
 
     private void Start()
     {
-        setFaceButton.onClick.AddListener(UpdateTargetedResult);
+        
+        diceAmountDropdown.onValueChanged.AddListener(OnDiceAmountChanged);
     }
 
-    public void UpdateTargetedResult()
+    public void OnDiceAmountChanged(int value)
     {
-        int faceValue;
-        if (int.TryParse(diceInputField.text, out faceValue) && faceValue >= 1 && faceValue <= 6)
+        int amount = value + 1; // Dropdown index starts from 0
+        diceManager.generateAmount = amount;
+
+        // Enable/Disable InputFields based on the amount
+        for (int i = 0; i < targetResultInputFields.Count; i++)
         {
-            Elements newTarget = (Elements)(faceValue - 1);
-            List<Elements> newTargetedResults = new List<Elements>();
+            targetResultInputFields[i].gameObject.SetActive(i < amount);
+        }
 
-            // Set the desired face for each dice (assuming all dice should show the same face)
-            for (int i = 0; i < diceManager.generateAmount; i++)
-            {
-                newTargetedResults.Add(newTarget);
-            }
+        // Deactivate all panels first
+        foreach (var panel in dicePanels)
+        {
+            panel.SetActive(false);
+        }
 
-            diceManager.targetedResult = newTargetedResults;
+        // Activate panels up to the selected value
+        for (int i = 0; i < amount && i < dicePanels.Count; i++)
+        {
+            dicePanels[i].SetActive(true);
+        }
+
+        // Force rebuild the layout
+        LayoutRebuilder.ForceRebuildLayoutImmediate(backgroundWoodDicePanelParent);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(foregroundWoodDicePanelParent);
+    }
+
+    public void UpdateTargetedResult(int index)
+    {
+        string inputText = targetResultInputFields[index].text.Trim();
+        Elements newTarget;
+
+        if (int.TryParse(inputText, out int faceValue) && faceValue >= 1 && faceValue <= 6)
+        {
+            newTarget = (Elements)(faceValue - 1);
         }
         else
         {
-            Debug.LogError("Invalid input: " + diceInputField.text);
+            newTarget = Elements.Any; // Default to any face if input is invalid
+        }
+
+        // Set the desired face for the selected dice
+        if (index < diceManager.targetedResult.Count)
+        {
+            diceManager.targetedResult[index] = newTarget;
+        }
+        else
+        {
+            // Ensure the targetedResult list is correctly sized
+            for (int i = diceManager.targetedResult.Count; i <= index; i++)
+            {
+                diceManager.targetedResult.Add(Elements.Any); // Default to any face if not set
+            }
+            diceManager.targetedResult[index] = newTarget;
         }
     }
 }

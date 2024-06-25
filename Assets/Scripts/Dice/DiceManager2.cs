@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -53,15 +52,18 @@ public class DiceManager2 : MonoBehaviour
         // Reset to initial state
         animRecorder.ResetToInitialState();
 
-        // Rotate to the desired face
+        // Rotate to the desired face if not 'Any'
         for (int i = 0; i < generateAmount; i++)
         {
-            // Ensure the dice has a valid default face result before rotating
-            if (diceDataList[i].diceLogic.defaultFaceResult == -1)
+            if (targetedResult[i] != Elements.Any)
             {
-                diceDataList[i].diceLogic.FindFaceResult();
+                // Ensure the dice has a valid default face result before rotating
+                if (diceDataList[i].diceLogic.defaultFaceResult == -1)
+                {
+                    diceDataList[i].diceLogic.FindFaceResult();
+                }
+                diceDataList[i].diceLogic.RotateDice((int)targetedResult[i]);
             }
-            diceDataList[i].diceLogic.RotateDice((int)targetedResult[i]);
         }
 
         // Play the recorded animation
