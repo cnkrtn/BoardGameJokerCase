@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d77ef8cfa80f3b4391709ac14b862f2, type: 3}
+  m_Name: d6
+  m_EditorClassIdentifier: 
+  faceRelativeRotation:
+  - element: 6
+    rotation:
+    - {x: 180, y: 0, z: 0}
+    - {x: 270, y: 0, z: 0}
+    - {x: 0, y: 0, z: 90}
+    - {x: 0, y: 0, z: -90}
+    - {x: 90, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+  - element: 3
+    rotation:
+    - {x: 0, y: 0, z: 90}
+    - {x: 0, y: 90, z: -90}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 0, z: 180}
+    - {x: 0, y: -90, z: 0}
+    - {x: 0, y: 0, z: -90}
+  - element: 2
+    rotation:
+    - {x: -90, y: 0, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: -90, y: -90, z: 0}
+    - {x: -90, y: 90, z: 0}
+    - {x: 180, y: 0, z: 0}
+    - {x: 90, y: 0, z: 0}
+  - element: 5
+    rotation:
+    - {x: 90, y: 0, z: 0}
+    - {x: 180, y: 0, z: 0}
+    - {x: 90, y: 90, z: 0}
+    - {x: 90, y: -90, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: -90, y: 0, z: 0}
+  - element: 1
+    rotation:
+    - {x: 0, y: 0, z: 0}
+    - {x: 90, y: 0, z: 0}
+    - {x: 0, y: 0, z: -90}
+    - {x: 0, y: 0, z: 90}
+    - {x: 270, y: 0, z: 0}
+    - {x: 180, y: 0, z: 0}
+  - element: 4
+    rotation:
+    - {x: 0, y: 0, z: -90}
+    - {x: 0, y: -90, z: 0}
+    - {x: 0, y: 0, z: 180}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 90, z: 0}
+    - {x: 0, y: 0, z: 90}
