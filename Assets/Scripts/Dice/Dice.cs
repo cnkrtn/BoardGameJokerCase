@@ -5,6 +5,7 @@ public class Dice : MonoBehaviour
     [Header("References")]
     public DiceRotationData diceData;
     public GameObject[] faceDetectors;
+    public int[] faceValues = { 6, 3, 2, 5, 1, 4 }; // Mapping from indices to face values
 
     [Header("Debug")]
     public int defaultFaceResult = -1;
@@ -14,7 +15,6 @@ public class Dice : MonoBehaviour
     {
         defaultFaceResult = -1;
         alteredFaceResult = -1;
-       
     }
 
     public int FindFaceResult()
@@ -24,12 +24,11 @@ public class Dice : MonoBehaviour
         {
             if (faceDetectors[maxIndex].transform.position.y < faceDetectors[i].transform.position.y)
             {
-                
                 maxIndex = i;
             }
         }
         defaultFaceResult = maxIndex;
-        Debug.Log($"The face that is shown: {defaultFaceResult}");
+        //Debug.Log($"The face that is shown: {defaultFaceResult}");
         return maxIndex;
     }
 

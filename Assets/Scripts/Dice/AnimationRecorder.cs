@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class AnimationRecorder : MonoBehaviour
 {
-    public DiceManager2 diceManager;
+    public DiceManager diceManager;
 
     [Header("Recording Variables")]
-    public int recordingFrameLength = 5 * 50;  //In frames
+    public int recordingFrameLength = 5 * 50;  // In frames
     public List<GameObject> objectsToRecord;
     public List<RecordingData> recordingDataList;
 
-    //Debug
+    // Debug
     private Coroutine playback = null;
 
     private void Update()
@@ -49,8 +49,7 @@ public class AnimationRecorder : MonoBehaviour
             Rigidbody rb = gameObject.GetComponent<Rigidbody>();
             rb.maxAngularVelocity = 1000;
 
-            RecordingData data = new RecordingData(rb, initialPosition,
-                                                       initialRotation);
+            RecordingData data = new RecordingData(rb, initialPosition, initialRotation);
             recordingDataList.Add(data);
         }
     }
@@ -59,10 +58,10 @@ public class AnimationRecorder : MonoBehaviour
     {
         Physics.simulationMode = SimulationMode.Script;
 
-        //Begin recording position and rotation for every frame
+        // Begin recording position and rotation for every frame
         for (int i = 0; i < recordingFrameLength; i++)
         {
-            //For every gameObject
+            // For every gameObject
             for (int j = 0; j < objectsToRecord.Count; j++)
             {
                 Vector3 position = objectsToRecord[j].transform.position;
@@ -71,8 +70,7 @@ public class AnimationRecorder : MonoBehaviour
                 bool isContactWithDice = diceManager.diceDataList[j].diceUI.isContactWithDice;
                 bool isNotMoving = CheckObjectHasStopped(diceManager.diceDataList[j].rb);
 
-                RecordedFrame frame = new RecordedFrame(position, rotation, isContactWithArena,
-                                                        isContactWithDice, isNotMoving);
+                RecordedFrame frame = new RecordedFrame(position, rotation, isContactWithArena, isContactWithDice, isNotMoving);
                 recordingDataList[j].recordedAnimation.Add(frame);
             }
             Physics.Simulate(Time.fixedDeltaTime);
@@ -94,10 +92,10 @@ public class AnimationRecorder : MonoBehaviour
         DisablePhysics();
         ResetToInitialState();
 
-        //Play the animation frame by frame
+        // Play the animation frame by frame
         for (int i = 0; i < recordingFrameLength; i++)
         {
-            //For every objects
+            // For every object
             for (int j = 0; j < recordingDataList.Count; j++)
             {
                 Vector3 position = recordingDataList[j].recordedAnimation[i].position;
@@ -105,40 +103,38 @@ public class AnimationRecorder : MonoBehaviour
                 objectsToRecord[j].transform.position = position;
                 objectsToRecord[j].transform.rotation = rotation;
 
-                //Play Sound whenever contact happens
-                if(recordingDataList[j].recordedAnimation[i].isContactWithArena)
-                {
-                   // diceManager.diceDataList[j].diceUI.PlaySoundRollLow();
-                }
-                if (recordingDataList[j].recordedAnimation[i].isContactWithDice)
-                {
-                   // diceManager.diceDataList[j].diceUI.PlaySoundRollHigh();
-                }
-
-                // //When the dice stops rolling, lit the texture
-                // if(recordingDataList[j].recordedAnimation[i].isNotMoving == true)
+                // // Play Sound whenever contact happens
+                // if (recordingDataList[j].recordedAnimation[i].isContactWithArena)
                 // {
-                //     diceManager.diceDataList[j].diceUI.ShowDiceResult();
+                //     diceManager.diceDataList[j].diceUI.PlaySoundRollLow();
+                // }
+                // if (recordingDataList[j].recordedAnimation[i].isContactWithDice)
+                // {
+                //     diceManager.diceDataList[j].diceUI.PlaySoundRollHigh();
                 // }
             }
             yield return new WaitForFixedUpdate();
         }
 
+        // Collect results from all dice
+        int diceSum = 0;
+        for (int k = 0; k < diceManager.diceDataList.Count; k++)
+        {
+            int faceIndex = diceManager.diceDataList[k].diceLogic.FindFaceResult();
+            int diceResult = diceManager.diceDataList[k].diceLogic.faceValues[faceIndex]; // Get the mapped face value
+            Debug.Log("Dice result: " + diceResult);
+            diceSum += diceResult;
+            Debug.Log("Dice sum: " + diceSum);
+        }
+
+        // Notify subscribers that the animation has finished with all results
+        EventManager.OnAnimationFinished?.Invoke(diceSum);
         playback = null;
     }
 
-    
-
-    /// <summary>
-    /// For optimization, this function is to check if the dice has stopped moving.
-    /// We can then stop recording this dice.
-    /// </summary>
-    /// <param name="rb"></param>
-    /// <returns></returns>
     public bool CheckObjectHasStopped(Rigidbody rb)
     {
-        if (rb.velocity == Vector3.zero &&
-            rb.angularVelocity == Vector3.zero)
+        if (rb.velocity == Vector3.zero && rb.angularVelocity == Vector3.zero)
         {
             Debug.Log("Object has stopped");
             return true;
@@ -157,7 +153,7 @@ public class AnimationRecorder : MonoBehaviour
 
     public void EnablePhysics()
     {
-        //Enable Rigidbody
+        // Enable Rigidbody
         for (int i = 0; i < recordingDataList.Count; i++)
         {
             recordingDataList[i].rb.useGravity = true;
@@ -167,14 +163,13 @@ public class AnimationRecorder : MonoBehaviour
 
     public void DisablePhysics()
     {
-        //Disable Rigidbody
+        // Disable Rigidbody
         for (int i = 0; i < recordingDataList.Count; i++)
         {
             recordingDataList[i].rb.useGravity = false;
             recordingDataList[i].rb.isKinematic = true;
         }
     }
-
 
     [System.Serializable]
     public struct RecordedFrame
@@ -185,9 +180,7 @@ public class AnimationRecorder : MonoBehaviour
         public bool isContactWithDice;
         public bool isNotMoving;
 
-        public RecordedFrame(Vector3 position, Quaternion rotation,
-                             bool isContactWithArena, bool isContactWithDice,
-                             bool isNotMoving)
+        public RecordedFrame(Vector3 position, Quaternion rotation, bool isContactWithArena, bool isContactWithDice, bool isNotMoving)
         {
             this.position = position;
             this.rotation = rotation;
@@ -205,8 +198,7 @@ public class AnimationRecorder : MonoBehaviour
         public Quaternion initialRotation;
         public List<RecordedFrame> recordedAnimation;
 
-        public RecordingData(Rigidbody rb, Vector3 initialPosition,
-                             Quaternion initialRotation)
+        public RecordingData(Rigidbody rb, Vector3 initialPosition, Quaternion initialRotation)
         {
             this.rb = rb;
             this.initialPosition = initialPosition;

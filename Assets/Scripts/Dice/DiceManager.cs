@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DiceManager2 : MonoBehaviour
+public class DiceManager : MonoBehaviour
 {
     public GameObject dicePrefab;
     public AnimationRecorder animRecorder;
@@ -113,7 +113,7 @@ public class DiceManager2 : MonoBehaviour
     private InitialState SetInitialState()
     {
         float x = transform.position.x + Random.Range(-transform.localScale.x / 2, transform.localScale.x / 2);
-        float y = transform.position.y + 2.0f; // Start 2 units above ground to ensure it falls
+        float y = transform.position.y + 5.0f; // Start 2 units above ground to ensure it falls
         float z = transform.position.z + Random.Range(-transform.localScale.z / 2, transform.localScale.z / 2);
         Vector3 position = new Vector3(x, y, z);
 

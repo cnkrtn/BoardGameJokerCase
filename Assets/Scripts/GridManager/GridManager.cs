@@ -8,25 +8,26 @@ public class GridManager : Singleton<GridManager>
 
     [Range(0, 100)]
     public float percentageToFill;
-    
+
     public GridSize gridSize;
     public GameObject gridCellPrefab;
-    public GameObject pathPrefab; // Reference to the new prefab
+    public GameObject edgeCellPrefab; // Prefab for the edge cells
     public Transform gridParent;
     public Transform finalPath;
-    
-    public bool createSquarePath = true; // New flag to control the square path
+
+    public bool createSquarePath = true;
 
     private int rows;
     private int columns;
     private Vector2Int unwalkableCenter;
     private int unwalkableSize;
     private int connectionCount = 0;
-    
+
     public Dictionary<Vector2Int, GameObject> gridCells;
     public List<Vector2Int> waypoints, modifiedWaypoints, finalPathTiles;
     public List<GameObject> finalPathGameObjects;
-
+    public List<GameObject> leftEdgeCells, rightEdgeCells, topEdgeCells, bottomEdgeCells;
+    private GameObject bottomLeftCorner, bottomRightCorner, topLeftCorner, topRightCorner;
     void Start()
     {
         gridCells = new Dictionary<Vector2Int, GameObject>();
@@ -38,6 +39,7 @@ public class GridManager : Singleton<GridManager>
         SetGridSize();
         SetUnwalkableArea();
         CreateGrid();
+        AddEdgeCells();
         CreateSections();
         FindPathsBetweenWaypoints();
         AssignPathTileIndices();
@@ -150,7 +152,7 @@ public class GridManager : Singleton<GridManager>
         }
     }
 
-    void CreateGrid()
+   void CreateGrid()
     {
         for (int i = 0; i < rows; i++)
         {
@@ -172,15 +174,87 @@ public class GridManager : Singleton<GridManager>
                     {
                         gridObject.walkable = false;
                     }
-                    else if (!createSquarePath && IsInPathToFirstRow(gridObject.gridPosition))
-                    {
-                        gridObject.walkable = false;
-                    }
                 }
             }
         }
     }
 
+   
+    void AddEdgeCells()
+    {
+        // Add left and right edge cells
+        for (int i = 0; i < rows; i++)
+        {
+            leftEdgeCells.Add(AddEdgeCell(new Vector2Int(i, -1))); // Left edge
+            rightEdgeCells.Add(AddEdgeCell(new Vector2Int(i, columns))); // Right edge
+        }
+
+        // Add top and bottom edge cells
+        for (int j = 0; j < columns; j++)
+        {
+            bottomEdgeCells.Add(AddEdgeCell(new Vector2Int(-1, j))); // Bottom edge
+            topEdgeCells.Add(AddEdgeCell(new Vector2Int(rows, j))); // Top edge
+        }
+
+        // Add corner cells
+        bottomLeftCorner = AddEdgeCell(new Vector2Int(-1, -1)); // Bottom-left corner
+        bottomRightCorner = AddEdgeCell(new Vector2Int(-1, columns)); // Bottom-right corner
+        topLeftCorner = AddEdgeCell(new Vector2Int(rows, -1)); // Top-left corner
+        topRightCorner = AddEdgeCell(new Vector2Int(rows, columns)); // Top-right corner
+
+        AdjustEdgeSprites();
+    }
+
+    private void AdjustEdgeSprites()
+    {
+        foreach (var tile in leftEdgeCells)
+        {
+            tile.transform.GetChild(0).gameObject.SetActive(false);
+            tile.transform.GetChild(1).gameObject.SetActive(true);
+            
+            var r0 = new Vector3(0, 90, 0);
+            tile.transform.rotation = Quaternion.Euler(r0);
+        }
+        
+        foreach (var tile in rightEdgeCells)
+        {
+            tile.transform.GetChild(0).gameObject.SetActive(false);
+            tile.transform.GetChild(1).gameObject.SetActive(true);
+            
+            var r0 = new Vector3(0, -90, 0);
+            tile.transform.rotation = Quaternion.Euler(r0);
+        }
+        foreach (var tile in topEdgeCells)
+        {
+            tile.transform.GetChild(0).gameObject.SetActive(false);
+            tile.transform.GetChild(1).gameObject.SetActive(true);
+            
+            var r0 = new Vector3(0, 0, 0);
+            tile.transform.rotation = Quaternion.Euler(r0);
+        }
+        foreach (var tile in bottomEdgeCells)
+        {
+            tile.transform.GetChild(0).gameObject.SetActive(false);
+            tile.transform.GetChild(1).gameObject.SetActive(true);
+            
+            var r0 = new Vector3(0, 180, 0);
+            tile.transform.rotation = Quaternion.Euler(r0);
+        }
+        
+        bottomLeftCorner.transform.rotation = Quaternion.Euler(0,90,0);
+        topLeftCorner.transform.rotation = Quaternion.Euler(0,0,0);
+        bottomRightCorner.transform.rotation = Quaternion.Euler(0,180,0);
+        topRightCorner.transform.rotation = Quaternion.Euler(0,270,0);
+        
+    }
+
+    GameObject AddEdgeCell(Vector2Int position)
+    {
+        GameObject edgeCell = Instantiate(edgeCellPrefab, new Vector3(position.x, 0, position.y), Quaternion.identity);
+        edgeCell.transform.parent = gridParent;
+        return edgeCell;
+    }
+    
     bool IsWithinUnwalkableArea(Vector2Int position)
     {
         int halfSize = unwalkableSize / 2;

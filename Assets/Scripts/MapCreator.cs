@@ -104,6 +104,8 @@ public class MapCreator : MonoBehaviour
             }
 
         }
+        GridManager.Instance.transform.localScale = 10*(Vector3.one);
+        EventManager.OnMapCreationCompleted?.Invoke();
     }
 
     private GameObject SelectPrefab(GridObject gridObject, int index)

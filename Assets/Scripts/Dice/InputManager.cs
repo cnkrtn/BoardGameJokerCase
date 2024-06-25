@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class InputManager : MonoBehaviour
 {
-    public DiceManager2 diceManager;
+    public DiceManager diceManager;
     public TMP_Dropdown diceAmountDropdown;
     public List<TMP_InputField> targetResultInputFields;
     [SerializeField] private List<GameObject> dicePanels;
