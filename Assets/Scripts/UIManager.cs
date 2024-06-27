@@ -18,14 +18,14 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
    
-        EventManager.OnStoppedOnACell += TileOutcome;
+        EventManager.OnStoppedOnACell += OnStoppedOnACell;
     }
 
     
     private void OnDisable()
     {
         
-        EventManager.OnStoppedOnACell -= TileOutcome;
+        EventManager.OnStoppedOnACell -= OnStoppedOnACell;
     }
     
     
@@ -59,7 +59,7 @@ public class UIManager : MonoBehaviour
         }
        
     }
-    private void TileOutcome(int fruitCount, int tileType)
+    private void OnStoppedOnACell(int fruitCount, int tileType,int currentGridIndex)
     {
         int previousCount;
         TextMeshProUGUI targetText;
@@ -82,6 +82,7 @@ public class UIManager : MonoBehaviour
                 targetText = amountTexts[2];
                 break;
             default:
+                
                 return;
         }
 

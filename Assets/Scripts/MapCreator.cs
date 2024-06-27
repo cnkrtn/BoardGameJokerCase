@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine.Serialization;
 
 
@@ -8,7 +9,9 @@ public class MapCreator : MonoBehaviour
     [SerializeField] private GameObject pathStraightApple,pathCornerApple;
     [SerializeField] private GameObject pathStraightStrawberry, pathCornerStrawberry;
     [SerializeField] private GameObject pathStraightPear, pathCornerPear;
-    [SerializeField] private GameObject specialTileStraight,specialTileCorner;
+    [SerializeField] private GameObject bearTileStraight,bearTileCorner;
+    [SerializeField] private GameObject horseTileStraight,horseTileCorner;
+    [SerializeField] private GameObject snakeTileStraight,snakeTileCorner;
     [SerializeField] private GameObject emptyTileStraight,emptyTileCorner;
     [SerializeField] private GameObject startTile;
     [SerializeField] private GameObject unwalkableTile;
@@ -40,96 +43,114 @@ private void OnTileConfigurationEnd()
             Vector3 position = cell.transform.position;
             Quaternion rotation = Quaternion.identity;
             var instantiatedObject = Instantiate(prefab, position, rotation, cell.transform);
-
-            GridObject previousGridObject;
-          
-            if (i != 0)
-            {
-                var previousTile = boardTiles[i - 1];
-                if (gridCells.TryGetValue(previousTile, out GameObject previousCell))
-                {
-                    previousGridObject = previousCell.GetComponent<GridObject>();
-                    previousDirection = previousGridObject.direction;
-                    previousPathTileIndex = previousGridObject.pathTileIndex;
-                }
-            }
-           
             
             switch (index)
-            {
-                // Horizontal
-                  
-                case 0:
-                case 1:
-                    
-                    if (gridObject.direction == new Vector2(1, 0)) 
-                    {
-                        rotation = Quaternion.Euler(0, -90, 0);
-                    }
-                    else if(gridObject.direction == new Vector2(-1, 0))
-                    {
-                        rotation = Quaternion.Euler(0, 90, 0);
-                    }
-                    else if (gridObject.direction == new Vector2(0, 1))
-                    {
-                        rotation = Quaternion.Euler(0, 180, 0);
-                    }
-                    else
-                    {
-                        rotation = Quaternion.Euler(0, 0, 0);
-                    }
-                    break;
-              
-                case 2:
-                    rotation = Quaternion.Euler(0, 90, 0);
-                    if (gridObject.direction == Vector2Int.down) 
-                    {
-                        instantiatedObject.transform.GetChild(1).gameObject.SetActive(true);
-                    }
-                    else if(gridObject.direction == Vector2Int.left)
-                    {
-                        instantiatedObject.transform.GetChild(0).gameObject.SetActive(true);
-                    }
-                
-                    break;
-                case 4:
-                    rotation = Quaternion.Euler(0, 180, 0);
-                    if (gridObject.direction == Vector2Int.up) 
-                    {
-                        instantiatedObject.transform.GetChild(0).gameObject.SetActive(true);
-                    }
-                    else if(gridObject.direction == Vector2Int.left)
-                    {
-                        instantiatedObject.transform.GetChild(1).gameObject.SetActive(true);
-                    }
-                    break;
-                case 5:
-                    rotation = Quaternion.Euler(0, -90, 0);
+{
+    // Horizontal
+    case 0:
+    case 1:
+        if (gridObject.direction == new Vector2(1, 0)) 
+        {
+            rotation = Quaternion.Euler(0, -90, 0);
+        }
+        else if (gridObject.direction == new Vector2(-1, 0))
+        {
+            rotation = Quaternion.Euler(0, 90, 0);
+        }
+        else if (gridObject.direction == new Vector2(0, 1))
+        {
+            rotation = Quaternion.Euler(0, 180, 0);
+        }
+        else
+        {
+            rotation = Quaternion.Euler(0, 0, 0);
+        }
+        
+        var textTransform = instantiatedObject.transform.GetChild(0).gameObject.transform.GetChild(0).transform;
+        textTransform.GetComponent<TextMeshPro>().text = gridObject.fruitCount.ToString();
+        break;
 
-                    if (gridObject.direction == Vector2Int.up) 
-                    {
-                        instantiatedObject.transform.GetChild(1).gameObject.SetActive(true);
-                    }
-                    else if(gridObject.direction == Vector2Int.right)
-                    {
-                        instantiatedObject.transform.GetChild(0).gameObject.SetActive(true);
-                    }
-                    
-                    break;
-                case 3:
-                    if (gridObject.direction == Vector2Int.down) 
-                    {
-                        instantiatedObject.transform.GetChild(0).gameObject.SetActive(true);
-                    }
-                    else if(gridObject.direction == Vector2Int.right)
-                    {
-                        instantiatedObject.transform.GetChild(1).gameObject.SetActive(true);
-                    }
-                
-                    break;
-            }
+    case 2:
+        rotation = Quaternion.Euler(0, 90, 0);
+        break;
 
-            instantiatedObject.transform.rotation = rotation;
+    case 4:
+        rotation = Quaternion.Euler(0, 180, 0);
+        break;
+
+    case 5:
+        rotation = Quaternion.Euler(0, -90, 0);
+        break;
+}
+
+
+instantiatedObject.transform.rotation = rotation;
+switch (index)
+{
+    case 2:
+        if (gridObject.direction == Vector2Int.down) 
+        {
+            instantiatedObject.transform.GetChild(1).gameObject.SetActive(true);
+            var textTransform = instantiatedObject.transform.GetChild(1).gameObject.transform.GetChild(0).transform;
+            textTransform.GetComponent<TextMeshPro>().text = gridObject.fruitCount.ToString();
+            textTransform.localRotation = Quaternion.Euler(new Vector3(0, 0, -135));
+        }
+        else if (gridObject.direction == Vector2Int.left)
+        {
+            instantiatedObject.transform.GetChild(0).gameObject.SetActive(true);
+            var textTransform = instantiatedObject.transform.GetChild(0).gameObject.transform.GetChild(0).transform;
+            textTransform.GetComponent<TextMeshPro>().text = gridObject.fruitCount.ToString();
+        }
+        break;
+
+    case 4:
+        if (gridObject.direction == Vector2Int.up) 
+        {
+            instantiatedObject.transform.GetChild(0).gameObject.SetActive(true);
+            var textTransform = instantiatedObject.transform.GetChild(0).gameObject.transform.GetChild(0).transform;
+            textTransform.GetComponent<TextMeshPro>().text = gridObject.fruitCount.ToString();
+        }
+        else if (gridObject.direction == Vector2Int.left)
+        {
+            instantiatedObject.transform.GetChild(1).gameObject.SetActive(true);
+            var textTransform = instantiatedObject.transform.GetChild(1).gameObject.transform.GetChild(0).transform;
+            textTransform.GetComponent<TextMeshPro>().text = gridObject.fruitCount.ToString();
+            textTransform.localRotation = Quaternion.Euler(new Vector3(0, 0, -45));
+        }
+        break;
+
+    case 5:
+        if (gridObject.direction == Vector2Int.up) 
+        {
+            instantiatedObject.transform.GetChild(1).gameObject.SetActive(true);
+            var textTransform = instantiatedObject.transform.GetChild(1).gameObject.transform.GetChild(0).transform;
+            textTransform.GetComponent<TextMeshPro>().text = gridObject.fruitCount.ToString();
+            textTransform.localRotation = Quaternion.Euler(new Vector3(0, 0, 45));
+        }
+        else if (gridObject.direction == Vector2Int.right)
+        {
+            instantiatedObject.transform.GetChild(0).gameObject.SetActive(true);
+            var textTransform = instantiatedObject.transform.GetChild(0).gameObject.transform.GetChild(0).transform;
+            textTransform.GetComponent<TextMeshPro>().text = gridObject.fruitCount.ToString();
+        }
+        break;
+
+    case 3:
+        if (gridObject.direction == Vector2Int.down) 
+        {
+            instantiatedObject.transform.GetChild(0).gameObject.SetActive(true);
+            var textTransform = instantiatedObject.transform.GetChild(0).gameObject.transform.GetChild(0).transform;
+            textTransform.GetComponent<TextMeshPro>().text = gridObject.fruitCount.ToString();
+        }
+        else if (gridObject.direction == Vector2Int.right)
+        {
+            instantiatedObject.transform.GetChild(1).gameObject.SetActive(true);
+            var textTransform = instantiatedObject.transform.GetChild(1).gameObject.transform.GetChild(0).transform;
+            textTransform.GetComponent<TextMeshPro>().text = gridObject.fruitCount.ToString();
+            textTransform.localRotation = Quaternion.Euler(new Vector3(0, 0, 135));
+        }
+        break;
+    }
         }
     }
 
@@ -176,18 +197,7 @@ private GameObject SelectPrefab(GridObject gridObject, int index)
         }
     }
 
-    if (gridObject.isSpecialTile)
-    {
-        if (index != 0 && index != 1)
-        {
-            return specialTileCorner;
-        }
-        else
-        {
-            return specialTileStraight;
-        }
-    }
-
+    
     if (gridObject.tileTypeIndex == 1)
     {
         if (index != 0 && index != 1)
@@ -223,10 +233,45 @@ private GameObject SelectPrefab(GridObject gridObject, int index)
             return pathStraightPear;
         }
     }
+    if (gridObject.tileTypeIndex == 4)
+    {
+        if (index != 0 && index != 1)
+        {
+            return bearTileCorner;
+        }
+        else
+        {
+            return bearTileStraight;
+        }
+    }
+    if (gridObject.tileTypeIndex == 5)
+    {
+        if (index != 0 && index != 1)
+        {
+            return horseTileCorner;
+        }
+        else
+        {
+            return horseTileStraight;
+        }
+    }
+    if (gridObject.tileTypeIndex == 6)
+    {
+        if (index != 0 && index != 1)
+        {
+            return snakeTileCorner;
+        }
+        else
+        {
+            return snakeTileStraight;
+        }
+    }
 
     if (gridObject.tileTypeIndex == 0)
     {
+        
         return startTile;
+        
     }
     return null;
 }

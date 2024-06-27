@@ -47,55 +47,108 @@ public class GridManager : Singleton<GridManager>
         SetBoardElements();
     }
 
-   private void SetBoardElements()
+ private void SetBoardElements()
 {
     finalPathGameObjects[0].GetComponent<GridObject>().tileTypeIndex = 0;
-    //finalPathGameObjects[0].GetComponent<GridObject>().isEmptyTile = false;
-
+    finalPathGameObjects[4].GetComponent<GridObject>().tileTypeIndex = 7;
+    
     for (int i = 1; i < waypoints.Count; i++)
     {
-        var tileObject = GetGameObjectAtGridPosition(waypoints[i]);
-        tileObject.GetComponent<GridObject>().isSpecialTile = true;
-       // tileObject.GetComponent<GridObject>().isEmptyTile = false;
+        if (i != 4)
+        {
+            var tileObject = GetGameObjectAtGridPosition(waypoints[i]);
+            var tileGridObject = tileObject.GetComponent<GridObject>();
+            switch (i)
+            {
+                case 1 or 5:
+                {
+                    tileGridObject.tileTypeIndex = 4;
+
+                    var bearNumber = Random.Range(1, 6);
+                    tileGridObject.fruitCount = bearNumber;
+                    break;
+                }
+                case 2 or 6:
+                {
+                    tileGridObject.tileTypeIndex = 5;
+
+                    var horseNumber = Random.Range(1, 2);
+                    tileGridObject.fruitCount = horseNumber;
+                    break;
+                }
+                case 3 or 7:
+                {
+                    tileGridObject.tileTypeIndex = 6;
+
+                    var snakeNumber = Random.Range(2, 4);
+                    tileGridObject.fruitCount = snakeNumber;
+                    break;
+                }
+            }
+        }
+        
+        
+        
     }
 
     var tileCount = finalPathTiles.Count - waypoints.Count;
     var tilesToFill = Mathf.RoundToInt((percentageToFill / 100) * tileCount);
-    // var emptyTiles = tileCount - tilesToFill;
-    var tilesToModify = (from tile in finalPathTiles where !waypoints.Contains(tile) select GetGameObjectAtGridPosition(tile)).ToList();
 
-    // Shuffle the tilesToModify list to randomize selection
+    var tilesToModify = (from tile in finalPathTiles where !waypoints.Contains(tile) select GetGameObjectAtGridPosition(tile)).ToList();
     tilesToModify = tilesToModify.OrderBy(x => Random.value).ToList();
 
-    // Modify the selected tiles
+    int appleCount = Mathf.RoundToInt(tilesToFill * 0.5f);
+    int pearCount = Mathf.RoundToInt(tilesToFill * 0.333f);
+    int strawberryCount = tilesToFill - appleCount - pearCount;
+
+    List<int> fruitCounts = new List<int>();
+
+    for (int i = 0; i < appleCount; i++)
+    {
+        fruitCounts.Add(1);
+    }
+    for (int i = 0; i < pearCount; i++)
+    {
+        fruitCounts.Add(2);
+    }
+    for (int i = 0; i < strawberryCount; i++)
+    {
+        fruitCounts.Add(3);
+    }
+
+    fruitCounts = fruitCounts.OrderBy(x => Random.value).ToList();
+
     for (int i = 0; i < tilesToFill; i++)
     {
         var tileObject = tilesToModify[i].GetComponent<GridObject>();
-        var option = Random.Range(0, 3);
-        var fruitNumber = Random.Range(5, 11);
-        switch (option)
+        int fruitType = fruitCounts[i];
+        int fruitNumber;
+
+        switch (fruitType)
         {
-            case 0:
-                tileObject.tileTypeIndex = 1;
-                tileObject.fruitCount = fruitNumber;
-                break;
             case 1:
-                tileObject.tileTypeIndex = 2;
-                tileObject.fruitCount = fruitNumber;
+                fruitNumber = Random.Range(1, 4);
+                tileObject.tileTypeIndex = 1;
                 break;
             case 2:
+                fruitNumber = Random.Range(4, 7);
+                tileObject.tileTypeIndex = 2;
+                break;
+            case 3:
+                fruitNumber = Random.Range(7, 10);
                 tileObject.tileTypeIndex = 3;
-                tileObject.fruitCount = fruitNumber;
+                break;
+            default:
+                fruitNumber = 0;
                 break;
         }
+
+        tileObject.fruitCount = fruitNumber;
     }
 
-    // Identify and modify the remaining tiles
     for (int i = tilesToFill; i < tilesToModify.Count; i++)
     {
         var tileObject = tilesToModify[i].GetComponent<GridObject>();
-        // Make the necessary changes to the remaining tiles here
-        // Example: Mark the remaining tiles as empty
         tileObject.tileTypeIndex = 10;
         tileObject.fruitCount = 0;
     }
@@ -507,27 +560,27 @@ public class GridManager : Singleton<GridManager>
             }
             else if (prevPos.Value.x < currentPos.x && nextPos.Value.y > currentPos.y)
             {
-                pathTileIndex = 4; // Top-Left to Bottom-Right turn
+                pathTileIndex = 4; // ottom-Left to Top-Right turn
                 direction = Vector2Int.up; // Coming from left, turning down
             }
             else if (prevPos.Value.y > currentPos.y && nextPos.Value.x < currentPos.x)
             {
-                pathTileIndex = 4; // Top-Left to Bottom-Right turn
+                pathTileIndex = 4; // Bottom-Left to Top-Right turn
                 direction = Vector2Int.left; // Coming from top, turning right
             }
             else if (prevPos.Value.x < currentPos.x && nextPos.Value.y < currentPos.y)
             {
-                pathTileIndex = 2; // Bottom-Left to Top-Right turn
+                pathTileIndex = 2; // Top-Left to Bottom-Right turn
                 direction = Vector2Int.down; // Coming from left, turning up
             }
             else if (prevPos.Value.y < currentPos.y && nextPos.Value.x < currentPos.x)
             {
-                pathTileIndex = 2; // Bottom-Left to Top-Right turn
+                pathTileIndex = 2; // Top-Left to Bottom-Right turn
                 direction = Vector2Int.left; // Coming from bottom, turning right
             }
             else if (prevPos.Value.x > currentPos.x && nextPos.Value.y > currentPos.y)
             {
-                pathTileIndex = 5; // Top-Right to Bottom-Left turn
+                pathTileIndex = 5; // Top-Left to Bottom-Right turn
                 direction = Vector2Int.up; // Coming from right, turning down
             }
             else if (prevPos.Value.y > currentPos.y && nextPos.Value.x > currentPos.x)
