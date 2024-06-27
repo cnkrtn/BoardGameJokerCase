@@ -4,10 +4,12 @@ using UnityEngine;
 public class DiceManager : MonoBehaviour
 {
     public GameObject dicePrefab;
+    public Transform planeTransform;
     public AnimationRecorder animRecorder;
     public int generateAmount = 1; // Set to 1 for single dice testing
     public List<Elements> targetedResult;
     public List<DiceData> diceDataList;
+    
 
     private void Start()
     {
@@ -112,9 +114,9 @@ public class DiceManager : MonoBehaviour
 
     private InitialState SetInitialState()
     {
-        float x = transform.position.x + Random.Range(-transform.localScale.x / 2, transform.localScale.x / 2);
-        float y = transform.position.y + 5.0f; // Start 2 units above ground to ensure it falls
-        float z = transform.position.z + Random.Range(-transform.localScale.z / 2, transform.localScale.z / 2);
+        float x = planeTransform.position.x + Random.Range(-transform.localScale.x / 2, transform.localScale.x / 2);
+        float y = planeTransform.position.y + 5.0f; // Start 2 units above ground to ensure it falls
+        float z = planeTransform.position.z + Random.Range(-transform.localScale.z / 2, transform.localScale.z / 2);
         Vector3 position = new Vector3(x, y, z);
 
         Quaternion rotation = Quaternion.identity; // No initial rotation

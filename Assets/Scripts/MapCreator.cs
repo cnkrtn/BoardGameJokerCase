@@ -5,9 +5,12 @@ using UnityEngine.Serialization;
 
 public class MapCreator : MonoBehaviour
 {
-    [SerializeField] private GameObject pathStraightApple, pathStraightStrawberry, pathStraightPear;
-    [SerializeField] private GameObject pathCornerApple, pathCornerStrawberry, pathCornerPear;
-    [SerializeField] private GameObject specialTileCorner, emptyTileCorner, specialTileStraight, emptyTileStraight,startTile;
+    [SerializeField] private GameObject pathStraightApple,pathCornerApple;
+    [SerializeField] private GameObject pathStraightStrawberry, pathCornerStrawberry;
+    [SerializeField] private GameObject pathStraightPear, pathCornerPear;
+    [SerializeField] private GameObject specialTileStraight,specialTileCorner;
+    [SerializeField] private GameObject emptyTileStraight,emptyTileCorner;
+    [SerializeField] private GameObject startTile;
     [SerializeField] private GameObject unwalkableTile;
 
     private void OnEnable()
@@ -19,151 +22,215 @@ public class MapCreator : MonoBehaviour
     {
         EventManager.OnTileConfigurationEnd -= OnTileConfigurationEnd;
     }
-
-    private void OnTileConfigurationEnd()
+private void OnTileConfigurationEnd()
+{
+    var boardTiles = GridManager.Instance.finalPathTiles;
+    var gridCells = GridManager.Instance.gridCells;
+    var gridCenter = GridManager.Instance.GetCenterGridCell().GetComponent<GridObject>().gridPosition;
+    Vector2Int previousDirection=new Vector2Int(1,0);
+    int previousPathTileIndex = 0;
+    for (int i = 0; i < boardTiles.Count; i++)
     {
-        var boardTiles = GridManager.Instance.finalPathTiles;
-        var gridCells = GridManager.Instance.gridCells;
-        foreach (var tile in boardTiles)
+        if (gridCells.TryGetValue(boardTiles[i], out GameObject cell))
         {
-            if (gridCells.TryGetValue(tile, out GameObject cell))
+           
+            GridObject gridObject = cell.GetComponent<GridObject>();
+            var index = gridObject.pathTileIndex;
+            GameObject prefab = SelectPrefab(gridObject, index);
+            Vector3 position = cell.transform.position;
+            Quaternion rotation = Quaternion.identity;
+            var instantiatedObject = Instantiate(prefab, position, rotation, cell.transform);
+
+            GridObject previousGridObject;
+          
+            if (i != 0)
             {
-                GridObject gridObject = cell.GetComponent<GridObject>();
-                var index = cell.GetComponent<GridObject>().pathTileIndex;
-                switch (index)
+                var previousTile = boardTiles[i - 1];
+                if (gridCells.TryGetValue(previousTile, out GameObject previousCell))
                 {
-                    case 0:
-                        
-                        var p0 = Instantiate(SelectPrefab(gridObject, index), cell.transform.position, Quaternion.identity,
-                            cell.transform);
-                        var random1 = Random.Range(0, 2);
-                        if (random1 == 0)
-                        {
-                            var r0 = new Vector3(0, -90, 0);
-                            p0.transform.rotation = Quaternion.Euler(r0);
-                        }
-                        else
-                        {
-                            var r0 = new Vector3(0, 90, 0);
-                            p0.transform.rotation = Quaternion.Euler(r0);
-                        }
-
-                        break;
-                    case 1:
-                        SelectPrefab(gridObject, index);
-                        var p1 = Instantiate(SelectPrefab(gridObject, index), cell.transform.position, Quaternion.identity,
-                            cell.transform);
-                        var random = Random.Range(0, 2);
-                        if (random == 0)
-                        {
-                            var r1 = new Vector3(0, 180, 0);
-                            p1.transform.rotation = Quaternion.Euler(r1);
-                        }
-
-                        break;
-                    case 2:
-                        GameObject p2 = Instantiate(SelectPrefab(gridObject, index), cell.transform.position, Quaternion.identity,
-                            cell.transform);
-                        var r2 = new Vector3(0, 90, 0);
-                        p2.transform.rotation = Quaternion.Euler(r2);
-                        break;
-                    case 3:
-                        Instantiate(SelectPrefab(gridObject, index), cell.transform.position, Quaternion.identity, cell.transform);
-                        break;
-                    case 4:
-                        GameObject p4 = Instantiate(SelectPrefab(gridObject, index), cell.transform.position, Quaternion.identity,
-                            cell.transform);
-                        var r4 = new Vector3(0, 180, 0);
-                        p4.transform.rotation = Quaternion.Euler(r4);
-                        break;
-                    case 5:
-                        GameObject p5 = Instantiate(SelectPrefab(gridObject, index), cell.transform.position, Quaternion.identity,
-                            cell.transform);
-                        var r5 = new Vector3(0, -90, 0);
-                        p5.transform.rotation = Quaternion.Euler(r5);
-                        break;
-
-
+                    previousGridObject = previousCell.GetComponent<GridObject>();
+                    previousDirection = previousGridObject.direction;
+                    previousPathTileIndex = previousGridObject.pathTileIndex;
                 }
             }
-        }
-
-        var transform = GridManager.Instance.transform;
-        for (int i = 1; i < transform.childCount; i++)
-        {
-            var tile = Instantiate(unwalkableTile, transform.GetChild(i).transform.position, Quaternion.identity,
-                transform.GetChild(i).transform);
-            var index = Random.Range(0, 20);
-            if (index >= tile.transform.childCount)
+           
+            
+            switch (index)
             {
-                tile.transform.GetChild(0).gameObject.SetActive(true);
-            }
-            else
-            {
-                tile.transform.GetChild(index).gameObject.SetActive(true);
+                // Horizontal
+                  
+                case 0:
+                case 1:
+                    
+                    if (gridObject.direction == new Vector2(1, 0)) 
+                    {
+                        rotation = Quaternion.Euler(0, -90, 0);
+                    }
+                    else if(gridObject.direction == new Vector2(-1, 0))
+                    {
+                        rotation = Quaternion.Euler(0, 90, 0);
+                    }
+                    else if (gridObject.direction == new Vector2(0, 1))
+                    {
+                        rotation = Quaternion.Euler(0, 180, 0);
+                    }
+                    else
+                    {
+                        rotation = Quaternion.Euler(0, 0, 0);
+                    }
+                    break;
+              
+                case 2:
+                    rotation = Quaternion.Euler(0, 90, 0);
+                    if (gridObject.direction == Vector2Int.down) 
+                    {
+                        instantiatedObject.transform.GetChild(1).gameObject.SetActive(true);
+                    }
+                    else if(gridObject.direction == Vector2Int.left)
+                    {
+                        instantiatedObject.transform.GetChild(0).gameObject.SetActive(true);
+                    }
+                
+                    break;
+                case 4:
+                    rotation = Quaternion.Euler(0, 180, 0);
+                    if (gridObject.direction == Vector2Int.up) 
+                    {
+                        instantiatedObject.transform.GetChild(0).gameObject.SetActive(true);
+                    }
+                    else if(gridObject.direction == Vector2Int.left)
+                    {
+                        instantiatedObject.transform.GetChild(1).gameObject.SetActive(true);
+                    }
+                    break;
+                case 5:
+                    rotation = Quaternion.Euler(0, -90, 0);
+
+                    if (gridObject.direction == Vector2Int.up) 
+                    {
+                        instantiatedObject.transform.GetChild(1).gameObject.SetActive(true);
+                    }
+                    else if(gridObject.direction == Vector2Int.right)
+                    {
+                        instantiatedObject.transform.GetChild(0).gameObject.SetActive(true);
+                    }
+                    
+                    break;
+                case 3:
+                    if (gridObject.direction == Vector2Int.down) 
+                    {
+                        instantiatedObject.transform.GetChild(0).gameObject.SetActive(true);
+                    }
+                    else if(gridObject.direction == Vector2Int.right)
+                    {
+                        instantiatedObject.transform.GetChild(1).gameObject.SetActive(true);
+                    }
+                
+                    break;
             }
 
+            instantiatedObject.transform.rotation = rotation;
         }
-        GridManager.Instance.transform.localScale = 10*(Vector3.one);
-        EventManager.OnMapCreationCompleted?.Invoke();
     }
 
-    private GameObject SelectPrefab(GridObject gridObject, int index)
+    var transform = GridManager.Instance.transform;
+    for (int i = 1; i < transform.childCount; i++)
     {
-        if (gridObject.isEmptyTile)
+        var tile = Instantiate(unwalkableTile, transform.GetChild(i).transform.position, Quaternion.identity,
+            transform.GetChild(i).transform);
+        var index = Random.Range(0, 20);
+        if (index >= tile.transform.childCount)
         {
-            if (index != 0 && index != 1)
-            {
-                return emptyTileCorner;
-            }
+            tile.transform.GetChild(0).gameObject.SetActive(true);
+        }
+        else
+        {
+            tile.transform.GetChild(index).gameObject.SetActive(true);
+        }
+    }
+    GridManager.Instance.transform.localScale = 10 * (Vector3.one);
+    EventManager.OnMapCreationCompleted?.Invoke();
+}
+
+private Vector3 GetGridCenter(Dictionary<Vector3Int, GameObject> gridCells)
+{
+    Vector3 sum = Vector3.zero;
+    foreach (var cell in gridCells.Values)
+    {
+        sum += cell.transform.position;
+    }
+    return sum / gridCells.Count;
+}
+
+private GameObject SelectPrefab(GridObject gridObject, int index)
+{
+    if (gridObject.tileTypeIndex == 10)
+    {
+        if (index != 0 && index != 1)
+        {
+            return emptyTileCorner;
+        }
+        else
+        {
             return emptyTileStraight;
         }
+    }
 
-        if (gridObject.isSpecialTile)
+    if (gridObject.isSpecialTile)
+    {
+        if (index != 0 && index != 1)
         {
-            if (index != 0 && index != 1)
-            {
-                return specialTileCorner;
-            }
+            return specialTileCorner;
+        }
+        else
+        {
             return specialTileStraight;
         }
+    }
 
-        if (gridObject.isAppleTile)
+    if (gridObject.tileTypeIndex == 1)
+    {
+        if (index != 0 && index != 1)
         {
-            if (index != 0 && index != 1)
-            {
-                return pathCornerApple;
-            }
-            else
-            {
-                return pathStraightApple;
-            }
+            return pathCornerApple;
         }
-
-        if (gridObject.isStrawberryTile)
+        else
         {
-            if (index != 0 && index != 1)
-            {
-                return pathCornerStrawberry;
-            }
+            return pathStraightApple;
+        }
+    }
+
+    if (gridObject.tileTypeIndex == 2)
+    {
+        if (index != 0 && index != 1)
+        {
+            return pathCornerStrawberry;
+        }
+        else
+        {
             return pathStraightStrawberry;
         }
+    }
 
-        if (gridObject.isPearTile)
+    if (gridObject.tileTypeIndex == 3)
+    {
+        if (index != 0 && index != 1)
         {
-            if (index != 0 && index != 1)
-            {
-                return pathCornerPear;
-            }
+            return pathCornerPear;
+        }
+        else
+        {
             return pathStraightPear;
         }
-        
-        if (gridObject.isStartTile)
-        {
-            return startTile;
-        }
-        return null;
     }
+
+    if (gridObject.tileTypeIndex == 0)
+    {
+        return startTile;
+    }
+    return null;
+}
+
 }
 
 

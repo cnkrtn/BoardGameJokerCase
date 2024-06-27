@@ -128,7 +128,7 @@ public class AnimationRecorder : MonoBehaviour
         }
 
         // Notify subscribers that the animation has finished with all results
-        EventManager.OnAnimationFinished?.Invoke(diceSum);
+        EventManager.OnSimAnimationFinished?.Invoke(diceSum);
         playback = null;
     }
 

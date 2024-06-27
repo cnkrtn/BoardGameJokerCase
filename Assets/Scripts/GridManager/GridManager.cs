@@ -47,51 +47,62 @@ public class GridManager : Singleton<GridManager>
         SetBoardElements();
     }
 
-    private void SetBoardElements()
+   private void SetBoardElements()
+{
+    finalPathGameObjects[0].GetComponent<GridObject>().tileTypeIndex = 0;
+    //finalPathGameObjects[0].GetComponent<GridObject>().isEmptyTile = false;
+
+    for (int i = 1; i < waypoints.Count; i++)
     {
-        finalPathGameObjects[0].GetComponent<GridObject>().isStartTile = true;
-        finalPathGameObjects[0].GetComponent<GridObject>().isEmptyTile = false;
-        for (int i = 1; i < waypoints.Count; i++)
-        {
-            var tileObject = GetGameObjectAtGridPosition(waypoints[i]);
-            tileObject.GetComponent<GridObject>().isSpecialTile = true;
-            tileObject.GetComponent<GridObject>().isEmptyTile = false;
-        }
-
-        var tileCount = finalPathTiles.Count - waypoints.Count;
-        var tilesToFill = Mathf.RoundToInt((percentageToFill / 100) * tileCount);
-        var emptyTiles = tileCount - tilesToFill;
-        var tilesToModify = (from tile in finalPathTiles where !waypoints.Contains(tile) select GetGameObjectAtGridPosition(tile)).ToList();
-        
-        
-        // Shuffle the tilesToModify list to randomize selection
-        tilesToModify = tilesToModify.OrderBy(x => Random.value).ToList();
-
-       
-        for (int i = 0; i < tilesToFill; i++)
-        {
-            var tileObject = tilesToModify[i].GetComponent<GridObject>();
-            var option = Random.Range(0, 3); 
-
-            switch (option)
-            {
-                case 0:
-                    tileObject.isAppleTile = true;
-                    tileObject.isEmptyTile = false;
-                    break;
-                case 1:
-                    tileObject.isPearTile = true;
-                    tileObject.isEmptyTile = false;
-                    break;
-                case 2:
-                    tileObject.isStrawberryTile = true;
-                    tileObject.isEmptyTile = false;
-                    break;
-            }
-        }
-        
-        EventManager.OnTileConfigurationEnd?.Invoke();
+        var tileObject = GetGameObjectAtGridPosition(waypoints[i]);
+        tileObject.GetComponent<GridObject>().isSpecialTile = true;
+       // tileObject.GetComponent<GridObject>().isEmptyTile = false;
     }
+
+    var tileCount = finalPathTiles.Count - waypoints.Count;
+    var tilesToFill = Mathf.RoundToInt((percentageToFill / 100) * tileCount);
+    // var emptyTiles = tileCount - tilesToFill;
+    var tilesToModify = (from tile in finalPathTiles where !waypoints.Contains(tile) select GetGameObjectAtGridPosition(tile)).ToList();
+
+    // Shuffle the tilesToModify list to randomize selection
+    tilesToModify = tilesToModify.OrderBy(x => Random.value).ToList();
+
+    // Modify the selected tiles
+    for (int i = 0; i < tilesToFill; i++)
+    {
+        var tileObject = tilesToModify[i].GetComponent<GridObject>();
+        var option = Random.Range(0, 3);
+        var fruitNumber = Random.Range(5, 11);
+        switch (option)
+        {
+            case 0:
+                tileObject.tileTypeIndex = 1;
+                tileObject.fruitCount = fruitNumber;
+                break;
+            case 1:
+                tileObject.tileTypeIndex = 2;
+                tileObject.fruitCount = fruitNumber;
+                break;
+            case 2:
+                tileObject.tileTypeIndex = 3;
+                tileObject.fruitCount = fruitNumber;
+                break;
+        }
+    }
+
+    // Identify and modify the remaining tiles
+    for (int i = tilesToFill; i < tilesToModify.Count; i++)
+    {
+        var tileObject = tilesToModify[i].GetComponent<GridObject>();
+        // Make the necessary changes to the remaining tiles here
+        // Example: Mark the remaining tiles as empty
+        tileObject.tileTypeIndex = 10;
+        tileObject.fruitCount = 0;
+    }
+
+    EventManager.OnTileConfigurationEnd?.Invoke();
+}
+
 
     private void GameObjectList()
     {
@@ -99,13 +110,15 @@ public class GridManager : Singleton<GridManager>
         {
             var tileObject = GetGameObjectAtGridPosition(tile);
             finalPathGameObjects.Add(tileObject);
+            
         }
-        
+       
         if (createSquarePath)
         {
             finalPathTiles.Add(waypoints[0]);
             var tileObject = GetGameObjectAtGridPosition(waypoints[0]);
             finalPathGameObjects.Add(tileObject);
+            finalPathGameObjects.RemoveAt(finalPathGameObjects.Count-1);
         }
         else
         {
@@ -262,11 +275,11 @@ public class GridManager : Singleton<GridManager>
                position.y >= unwalkableCenter.y - halfSize && position.y <= unwalkableCenter.y + halfSize;
     }
 
-    bool IsInPathToFirstRow(Vector2Int position)
-    {
-        int halfSize = unwalkableSize / 2;
-        return position.x >= unwalkableCenter.x - halfSize && position.x <= unwalkableCenter.x + halfSize && position.y <= unwalkableCenter.y;
-    }
+    // bool IsInPathToFirstRow(Vector2Int position)
+    // {
+    //     int halfSize = unwalkableSize / 2;
+    //     return position.x >= unwalkableCenter.x - halfSize && position.x <= unwalkableCenter.x + halfSize && position.y <= unwalkableCenter.y;
+    // }
 
     void CreateSections()
     {
@@ -369,8 +382,6 @@ public class GridManager : Singleton<GridManager>
             if (gridObject != null)
             {
                 gridObject.walkable = true;
-                // GameObject pathObject = Instantiate(pathPrefab, cell.transform.position, Quaternion.identity, cell.transform);
-                // pathObject.GetComponent<Renderer>().material.color = Color.green;
             }
         }
 
@@ -402,7 +413,7 @@ public class GridManager : Singleton<GridManager>
                     {
                         GridObject gridObject = cell.GetComponent<GridObject>();
                         gridObject.walkable = false;
-                         //Instantiate(pathPrefab, cell.transform.position, Quaternion.identity, cell.transform);
+                         
                     }
                 }
             }
@@ -475,36 +486,64 @@ public class GridManager : Singleton<GridManager>
 
         var gameObject = GetGameObjectAtGridPosition(currentPos);
         int pathTileIndex = -1;
+        Vector2Int direction = Vector2Int.zero;
 
-        if (i == 0 && !createSquarePath)
+        if (i == 0)
         {
-            pathTileIndex = 5; // First element if not a loop
+            pathTileIndex = 5; // First element
+            direction = Vector2Int.up; // Start direction is always positive y (up)
         }
         else if (prevPos.HasValue && nextPos.HasValue)
         {
             if (prevPos.Value.x == currentPos.x && nextPos.Value.x == currentPos.x)
             {
                 pathTileIndex = 1; // Vertical
+                direction = new Vector2Int(0, nextPos.Value.y > currentPos.y ? 1 : -1);
             }
             else if (prevPos.Value.y == currentPos.y && nextPos.Value.y == currentPos.y)
             {
                 pathTileIndex = 0; // Horizontal
+                direction = new Vector2Int(nextPos.Value.x > currentPos.x ? 1 : -1, 0);
             }
-            else if ((prevPos.Value.x < currentPos.x && nextPos.Value.y > currentPos.y) || (prevPos.Value.y > currentPos.y && nextPos.Value.x < currentPos.x))
+            else if (prevPos.Value.x < currentPos.x && nextPos.Value.y > currentPos.y)
             {
                 pathTileIndex = 4; // Top-Left to Bottom-Right turn
+                direction = Vector2Int.up; // Coming from left, turning down
             }
-            else if ((prevPos.Value.x < currentPos.x && nextPos.Value.y < currentPos.y) || (prevPos.Value.y < currentPos.y && nextPos.Value.x < currentPos.x))
+            else if (prevPos.Value.y > currentPos.y && nextPos.Value.x < currentPos.x)
+            {
+                pathTileIndex = 4; // Top-Left to Bottom-Right turn
+                direction = Vector2Int.left; // Coming from top, turning right
+            }
+            else if (prevPos.Value.x < currentPos.x && nextPos.Value.y < currentPos.y)
             {
                 pathTileIndex = 2; // Bottom-Left to Top-Right turn
+                direction = Vector2Int.down; // Coming from left, turning up
             }
-            else if ((prevPos.Value.x > currentPos.x && nextPos.Value.y > currentPos.y) || (prevPos.Value.y > currentPos.y && nextPos.Value.x > currentPos.x))
+            else if (prevPos.Value.y < currentPos.y && nextPos.Value.x < currentPos.x)
+            {
+                pathTileIndex = 2; // Bottom-Left to Top-Right turn
+                direction = Vector2Int.left; // Coming from bottom, turning right
+            }
+            else if (prevPos.Value.x > currentPos.x && nextPos.Value.y > currentPos.y)
             {
                 pathTileIndex = 5; // Top-Right to Bottom-Left turn
+                direction = Vector2Int.up; // Coming from right, turning down
             }
-            else if ((prevPos.Value.x > currentPos.x && nextPos.Value.y < currentPos.y) || (prevPos.Value.y < currentPos.y && nextPos.Value.x > currentPos.x))
+            else if (prevPos.Value.y > currentPos.y && nextPos.Value.x > currentPos.x)
+            {
+                pathTileIndex = 5; // Top-Right to Bottom-Left turn
+                direction = Vector2Int.right; // Coming from top, turning left
+            }
+            else if (prevPos.Value.x > currentPos.x && nextPos.Value.y < currentPos.y)
             {
                 pathTileIndex = 3; // Bottom-Right to Top-Left turn
+                direction = Vector2Int.down; // Coming from right, turning up
+            }
+            else if (prevPos.Value.y < currentPos.y && nextPos.Value.x > currentPos.x)
+            {
+                pathTileIndex = 3; // Bottom-Right to Top-Left turn
+                direction = Vector2Int.right; // Coming from bottom, turning left
             }
         }
         else if (nextPos.HasValue)
@@ -512,10 +551,12 @@ public class GridManager : Singleton<GridManager>
             if (nextPos.Value.x == currentPos.x)
             {
                 pathTileIndex = 1; // Vertical start
+                direction = new Vector2Int(0, nextPos.Value.y > currentPos.y ? 1 : -1);
             }
             else if (nextPos.Value.y == currentPos.y)
             {
                 pathTileIndex = 0; // Horizontal start
+                direction = new Vector2Int(nextPos.Value.x > currentPos.x ? 1 : -1, 0);
             }
         }
         else if (prevPos.HasValue)
@@ -523,22 +564,32 @@ public class GridManager : Singleton<GridManager>
             if (prevPos.Value.x == currentPos.x)
             {
                 pathTileIndex = 1; // Vertical end
+                direction = new Vector2Int(0, prevPos.Value.y > currentPos.y ? -1 : 1);
             }
             else if (prevPos.Value.y == currentPos.y)
             {
                 pathTileIndex = 0; // Horizontal end
+                direction = new Vector2Int(prevPos.Value.x > currentPos.x ? -1 : 1, 0);
             }
         }
 
         if (pathTileIndex != -1)
         {
-            gameObject.GetComponent<GridObject>().pathTileIndex = pathTileIndex;
+            var gridObject = gameObject.GetComponent<GridObject>();
+            gridObject.pathTileIndex = pathTileIndex;
+            gridObject.direction = direction; // Set the direction
         }
     }
 }
 
 
 
+public GameObject GetCenterGridCell()
+{
+    Vector2Int centerPosition = new Vector2Int(rows / 2, columns / 2);
+    gridCells.TryGetValue(centerPosition, out GameObject centerCell);
+    return centerCell;
+}
 
     public GameObject GetGameObjectAtGridPosition(Vector2Int position)
     {

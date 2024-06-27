@@ -13,6 +13,12 @@ public class LerpHelper : MonoBehaviour
     public static float EaseOutCubic(float t) { return (--t) * t * t + 1f; }
     public static float EaseInOutCubic(float t) { return t < 0.5f ? 4f * t * t * t : (t - 1f) * (2f * t - 2f) * (2f * t - 2f) + 1f; }
 
+    // Custom easing function for yoyo effect
+    public static float EaseYoyo(float t) 
+    {
+        return t <= 0.5f ? t * 2f : 2f * (1f - t);
+    }
+
     // Position Lerp for RectTransform
     public static IEnumerator LerpPosition(RectTransform rectTransform, Vector3 startPosition, Vector3 endPosition, float duration, Func<float, float> easingFunction)
     {
@@ -67,19 +73,34 @@ public class LerpHelper : MonoBehaviour
         return LerpPosition(startTransform, startPosition, endPosition, duration, easingFunction);
     }
 
-    // Scale Lerp
-    public static IEnumerator LerpScale(RectTransform rectTransform, Vector3 startScale, Vector3 endScale, float duration, Func<float, float> easingFunction)
+    // Custom Scale Lerp with Yoyo effect
+    public static IEnumerator LerpScaleYoyo(RectTransform rectTransform, Vector3 startScale, Vector3 peakScale, float duration)
     {
+        float halfDuration = duration / 2;
+        
+        // Scaling up
         float time = 0;
-        while (time < duration)
+        while (time < halfDuration)
         {
-            float t = time / duration;
-            t = easingFunction(t);
-            rectTransform.localScale = Vector3.Lerp(startScale, endScale, t);
+            float t = time / halfDuration;
+            t = EaseInOutQuad(t);
+            rectTransform.localScale = Vector3.Lerp(startScale, peakScale, t);
             time += Time.deltaTime;
             yield return null;
         }
-        rectTransform.localScale = endScale;
+        
+        // Scaling down
+        time = 0;
+        while (time < halfDuration)
+        {
+            float t = time / halfDuration;
+            t = EaseInOutQuad(t);
+            rectTransform.localScale = Vector3.Lerp(peakScale, startScale, t);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        
+        rectTransform.localScale = startScale;
     }
 
     // Color Fade Lerp
@@ -109,6 +130,7 @@ public class LerpHelper : MonoBehaviour
             case EasingFunctionType.EaseInCubic: return EaseInCubic;
             case EasingFunctionType.EaseOutCubic: return EaseOutCubic;
             case EasingFunctionType.EaseInOutCubic: return EaseInOutCubic;
+            case EasingFunctionType.EaseYoyo: return EaseYoyo;
             default: return EaseLinear;
         }
     }
@@ -123,5 +145,6 @@ public enum EasingFunctionType
     EaseInCubic,
     EaseOutCubic,
     EaseInOutCubic,
+    EaseYoyo,
     // Add more as needed
 }

@@ -5,10 +5,12 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private GameObject player;
+    [SerializeField] private GameObject player,playerParent;
     [SerializeField] private Animator playerAnimator;
+    [SerializeField] private float lerpDuration,slerpDuration;
     private int _currentGridIndex, _targetIndex;
     private static readonly int IsWalking = Animator.StringToHash("isWalking");
+    
 
     private void Start()
     {
@@ -18,13 +20,15 @@ public class GameManager : MonoBehaviour
     private void OnEnable()
     {
         EventManager.OnMapCreationCompleted += OnMapCreationCompleted;
-        EventManager.OnAnimationFinished += OnAnimationFinished;
+        EventManager.OnSimAnimationFinished += OnAnimationFinished;
+        EventManager.OnStoppedOnACell += TileOutcome;
     }
 
     private void OnDisable()
     {
         EventManager.OnMapCreationCompleted -= OnMapCreationCompleted;
-        EventManager.OnAnimationFinished -= OnAnimationFinished;
+        EventManager.OnSimAnimationFinished -= OnAnimationFinished;
+        EventManager.OnStoppedOnACell -= TileOutcome;
     }
 
     private void OnAnimationFinished(int sum)
@@ -44,19 +48,7 @@ public class GameManager : MonoBehaviour
         // Move player to the new position
         MovePlayerToNewPosition(_targetIndex);
     }
-
-    private IEnumerator AdjustPlayerTurns(Vector3 targetDirection)
-    {
-        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
-
-        while (Quaternion.Angle(player.transform.rotation, targetRotation) > 0.1f)
-        {
-            player.transform.rotation = Quaternion.Slerp(player.transform.rotation, targetRotation, Time.deltaTime * 8f); // Adjust the speed factor as needed
-            yield return null;
-        }
-
-        player.transform.rotation = targetRotation;
-    }
+    
 
     private void MovePlayerToNewPosition(int targetIndex)
     {
@@ -69,6 +61,8 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator MoveThroughPath(int targetIndex)
     {
+        playerAnimator.SetBool(IsWalking, true);
+
         while (_currentGridIndex != targetIndex)
         {
             Debug.Log("Moving through path...");
@@ -77,21 +71,36 @@ public class GameManager : MonoBehaviour
                 .finalPathGameObjects[(_currentGridIndex + 1) % GridManager.Instance.finalPathGameObjects.Count]
                 .transform;
 
-            // Start moving to the next cell
-            playerAnimator.SetBool(IsWalking, true);
-
             // Calculate the target direction for rotation
             Vector3 targetDirection = (nextCellTransform.position - currentCellTransform.position).normalized;
-            yield return StartCoroutine(AdjustPlayerTurns(targetDirection));
-        
-            yield return StartCoroutine(LerpHelper.LerpPosition(player.transform, currentCellTransform.position, nextCellTransform.position, 2f, LerpHelper.GetEasingFunction(EasingFunctionType.EaseInOutQuad)));
-            playerAnimator.SetBool(IsWalking, false);
+            StartCoroutine(AdjustPlayerTurns(targetDirection));
+
+            // Move to the next cell
+            yield return StartCoroutine(LerpHelper.LerpPosition(playerParent.transform, currentCellTransform.position, nextCellTransform.position, lerpDuration, LerpHelper.GetEasingFunction(EasingFunctionType.Linear)));
 
             // Increment the current grid index
             _currentGridIndex = (_currentGridIndex + 1) % GridManager.Instance.finalPathGameObjects.Count;
         }
+
+        playerAnimator.SetBool(IsWalking, false);
+        var gridObject = GridManager.Instance.finalPathGameObjects[_currentGridIndex].GetComponent<GridObject>();
+        var fruitCount = gridObject.fruitCount;
+        var tileType = gridObject.tileTypeIndex;
+        EventManager.OnStoppedOnACell?.Invoke(fruitCount,tileType);
     }
 
+    private IEnumerator AdjustPlayerTurns(Vector3 targetDirection)
+    {
+        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+
+        while (Quaternion.Angle(player.transform.rotation, targetRotation) > 0.1f)
+        {
+            player.transform.rotation = Quaternion.Slerp(player.transform.rotation, targetRotation, Time.deltaTime * slerpDuration); 
+            yield return null;
+        }
+
+        player.transform.rotation = targetRotation;
+    }
 
 
     private void OnMapCreationCompleted()
@@ -102,5 +111,26 @@ public class GameManager : MonoBehaviour
          player.transform.position = startTransform.position;
         // var r0 = new Vector3(0, -90, 0);
         // player.transform.rotation = Quaternion.Euler(r0);
+    }
+
+    private void TileOutcome(int fruitCount, int tileType)
+    {
+        switch (tileType)
+        {
+            case 1:
+                DataManager.Instance.appleCount += fruitCount;
+                Debug.Log("adjfnbkasdnfasdf: " + DataManager.Instance.appleCount +"--- "+ fruitCount);
+            break;
+            case 2:
+                DataManager.Instance.strawberryCount += fruitCount;
+                Debug.Log("adjfnbkasdnfasdf: " + DataManager.Instance.strawberryCount +"--- "+ fruitCount);
+                break;
+            case 3:
+                DataManager.Instance.pearCount += fruitCount;
+                Debug.Log("adjfnbkasdnfasdf: " + DataManager.Instance.pearCount + "--- "+ fruitCount);
+                break;
+            
+        }
+        DataManager.Instance.SaveData();
     }
 }
