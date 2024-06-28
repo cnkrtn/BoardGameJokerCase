@@ -137,13 +137,7 @@ public class UIManager : MonoBehaviour
         
     }
 
-    public void OpenPanel(RectTransform panel)
-    {
-        panel.localScale = Vector3.zero;
-        panel.gameObject.SetActive(true);
-        StartCoroutine(LerpHelper.LerpScale(panel, panel.localScale, Vector3.one * 0.8f, .2f,
-            LerpHelper.GetEasingFunction(EasingFunctionType.Linear)));
-    }
+   
 
 
     private IEnumerator CountUpText(TextMeshProUGUI textComponent, int startValue, int endValue, float duration)
@@ -367,7 +361,13 @@ public class UIManager : MonoBehaviour
         StartCoroutine(LerpHelper.LerpScaleYoyo(transformR, Vector3.one, 1.5f * Vector3.one, 1f));
         StartCoroutine(LerpHelper.LerpScaleYoyo(transformS, Vector3.one, 1.5f * Vector3.one, 1f));
     }
-
+    public void OpenPanel(RectTransform panel)
+    {
+        panel.localScale = Vector3.zero;
+        panel.gameObject.SetActive(true);
+        StartCoroutine(LerpHelper.LerpScale(panel, panel.localScale, Vector3.one * 0.8f, .2f,
+            LerpHelper.GetEasingFunction(EasingFunctionType.Linear)));
+    }
     public void CloseDown(RectTransform panel)
     {
         panel.localScale = Vector3.one * .8f;
@@ -387,5 +387,17 @@ public class UIManager : MonoBehaviour
     public void ToggleSound(){AudioManager.Instance.ToggleSfx();}
     public void MusicVolume(){AudioManager.Instance.MusicVolume(musicSlider.value);}
     public void SfxVolume(){AudioManager.Instance.SfxVolume(soundSlider.value);}
+    
+    private void SetVolumeSliders()
+    {
+        musicSlider.value = DataManager.Instance.musicVolume;
+        soundSlider.value = DataManager.Instance.soundVolume;
+        // musicToggle.isOn = DataManager.Instance.musicToggle;
+        // soundToggle.isOn = DataManager.Instance.soundToggle;
+    }
 
+    public void PlaySound(string name)
+    {
+        AudioManager.Instance.PlaySound(name);
+    }
 }

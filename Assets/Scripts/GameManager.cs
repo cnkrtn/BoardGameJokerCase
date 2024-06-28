@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private GameObject player,playerParent;
-    [SerializeField] private Animator playerAnimator;
+    [SerializeField] private Animator playerAnimator,fadeAnimator;
     [SerializeField] private float lerpDuration,slerpDuration;
     private int _currentGridIndex, _targetIndex;
     private static readonly int IsWalking = Animator.StringToHash("isWalking");
@@ -31,6 +31,12 @@ public class GameManager : MonoBehaviour
         EventManager.OnMapCreationCompleted -= OnMapCreationCompleted;
         EventManager.OnSimAnimationFinished -= OnSimAnimationFinished;
         EventManager.OnStoppedOnACell -= OnStoppedOnACell;
+    }
+
+    private void Start()
+    {
+        AudioManager.Instance.PlayMusic("GameMusic");
+        fadeAnimator.Play("FadeAnimationIn");
     }
 
     private void OnSimAnimationFinished(int sum)

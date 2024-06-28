@@ -22,18 +22,46 @@ public class AnimationManager : MonoBehaviour
 
     private void OnStoppedOnACell(int arg1, int arg2, int currentGridIndex)
     {
+        AudioManager.Instance.PlaySound("WalkEnd");
         var gameObject = GridManager.Instance.finalPathGameObjects[currentGridIndex];
         var animator = gameObject.transform.GetChild(0).GetComponent<Animator>();
 
-        if (animator != null)
-        {
-            animationCamera.Priority = 11;
-            animator.Play("Play");
-            StartCoroutine(WaitForAnimationEnd(animator, "Play"));
-            playerAnimator.Play("Happy");
-        }
+        if (animator == null) return;
+        animationCamera.Priority = 11;
+        animator.Play("Play");
+        StartCoroutine(WaitForAnimationEnd(animator, "Play"));
+        playerAnimator.Play("Happy");
+
+        var index = GridManager.Instance.finalPathGameObjects[currentGridIndex].GetComponent<GridObject>().tileTypeIndex;
         
-       
+        
+        switch (index)
+        {
+            case 1:
+                AudioManager.Instance.PlaySound("AppleWin");
+                break;
+            case 2:
+                AudioManager.Instance.PlaySound("StrawberryWin");
+                break;
+            case 3:
+                AudioManager.Instance.PlaySound("PearWin");
+                break;
+            case 4:
+                AudioManager.Instance.PlaySound("AppleLose");
+                break;
+            case 5:
+                AudioManager.Instance.PlaySound("StrawberryLose");
+                
+                break;
+            case 6:
+                AudioManager.Instance.PlaySound("PearLose");
+                break;
+            case 7:
+                AudioManager.Instance.PlaySound("Market");
+                break;
+        }
+
+
     }
 
     private IEnumerator WaitForAnimationEnd(Animator animator, string animationName)

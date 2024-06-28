@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2458296378457694465}
-  - component: {fileID: 2724577229035610936}
   m_Layer: 0
   m_Name: AudioSource
   m_TagString: Untagged
@@ -32,102 +31,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6010172828811471361}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!82 &2724577229035610936
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1672113357824619335}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1 &2093689237117347270
 GameObject:
   m_ObjectHideFlags: 0
@@ -308,5 +211,31 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 9c28035f0a10f344a983e651d2e8d6cb, type: 3}
   - name: DiceToDice
     clip: {fileID: 8300000, guid: 89e8d6039ff03284c9001124dfc6aea7, type: 3}
+  - name: AppleWin
+    clip: {fileID: 8300000, guid: cef95b5a8a132994abe8bb4f90ed795a, type: 3}
+  - name: AppleLose
+    clip: {fileID: 8300000, guid: d1806c3adf73ce84488d13e5f83ba18d, type: 3}
+  - name: StrawberryWin
+    clip: {fileID: 8300000, guid: 2c224f2a239205e43ae71d6540a7643d, type: 3}
+  - name: StrawberryLose
+    clip: {fileID: 8300000, guid: b094b578b4a350d4eb4c110b18694e6f, type: 3}
+  - name: PearWin
+    clip: {fileID: 8300000, guid: e310119e75d35a94c946aae896d9ed72, type: 3}
+  - name: PearLose
+    clip: {fileID: 8300000, guid: 0d7fd26739f76b94ca480c777dbfd4c2, type: 3}
+  - name: Walk
+    clip: {fileID: 8300000, guid: 5e2e85218bb332142833dec5aedd280c, type: 3}
+  - name: WalkEnd
+    clip: {fileID: 8300000, guid: 6b47a9879e8a84745b2c66b35b1eab6f, type: 3}
+  - name: Button
+    clip: {fileID: 8300000, guid: 5ea169cae2b13514282de6238c389e3e, type: 3}
+  - name: Market
+    clip: {fileID: 8300000, guid: 89e8d6039ff03284c9001124dfc6aea7, type: 3}
   musicSource: {fileID: 3569603199392717520}
-  soundSource: {fileID: 2724577229035610936}
+  soundSources:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  soundSourceObject: {fileID: 2458296378457694465}
