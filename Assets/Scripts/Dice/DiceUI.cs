@@ -54,14 +54,14 @@ public class DiceUI : MonoBehaviour
     //when the sound should be played
     public void PlaySoundRollLow()
     {
-        if (!soundCollideFloor.isPlaying)
-             soundCollideFloor.Play();
+        
+             AudioManager.Instance.PlaySound("DiceToFloor");
     }
 
     public void PlaySoundRollHigh()
     {
-        if (!soundCollideDice.isPlaying)
-             soundCollideDice.Play();
+      
+            AudioManager.Instance.PlaySound("DiceToDice");
     }
 
     private void OnCollisionEnter(Collision collision)

@@ -40,23 +40,43 @@ public class InputManager : MonoBehaviour
             dicePanels[i].SetActive(true);
         }
 
+        // Adjust the size of the targetedResult list
+        if (diceManager.targetedResult.Count > amount)
+        {
+            diceManager.targetedResult.RemoveRange(amount, diceManager.targetedResult.Count - amount);
+        }
+        else
+        {
+            for (int i = diceManager.targetedResult.Count; i < amount; i++)
+            {
+                diceManager.targetedResult.Add(DiceManager.Elements.Any); // Default to any face if not set
+            }
+        }
+
+        // Generate or remove dice objects based on the new amount without animating them
+        diceManager.GenerateDice(amount, false);
+
         // Force rebuild the layout
         LayoutRebuilder.ForceRebuildLayoutImmediate(backgroundWoodDicePanelParent);
         LayoutRebuilder.ForceRebuildLayoutImmediate(foregroundWoodDicePanelParent);
     }
 
+
+
+
+
     public void UpdateTargetedResult(int index)
     {
         string inputText = targetResultInputFields[index].text.Trim();
-        Elements newTarget;
+        DiceManager.Elements newTarget;
 
         if (int.TryParse(inputText, out int faceValue) && faceValue >= 1 && faceValue <= 6)
         {
-            newTarget = (Elements)(faceValue - 1);
+            newTarget = (DiceManager.Elements)(faceValue - 1);
         }
         else
         {
-            newTarget = Elements.Any; // Default to any face if input is invalid
+            newTarget = DiceManager.Elements.Any; // Default to any face if input is invalid
         }
 
         // Set the desired face for the selected dice
@@ -69,7 +89,7 @@ public class InputManager : MonoBehaviour
             // Ensure the targetedResult list is correctly sized
             for (int i = diceManager.targetedResult.Count; i <= index; i++)
             {
-                diceManager.targetedResult.Add(Elements.Any); // Default to any face if not set
+                diceManager.targetedResult.Add(DiceManager.Elements.Any); // Default to any face if not set
             }
             diceManager.targetedResult[index] = newTarget;
         }

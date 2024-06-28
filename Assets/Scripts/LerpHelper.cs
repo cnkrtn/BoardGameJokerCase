@@ -72,6 +72,20 @@ public class LerpHelper : MonoBehaviour
         Vector3 endPosition = endTransform.position;
         return LerpPosition(startTransform, startPosition, endPosition, duration, easingFunction);
     }
+    
+    public static IEnumerator LerpScale(RectTransform rectTransform, Vector3 startScale, Vector3 endScale, float duration, Func<float, float> easingFunction)
+    {
+        float time = 0;
+        while (time < duration)
+        {
+            float t = time / duration;
+            t = easingFunction(t);
+            rectTransform.localScale = Vector3.Lerp(startScale, endScale, t);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        rectTransform.localScale = endScale;
+    }
 
     // Custom Scale Lerp with Yoyo effect
     public static IEnumerator LerpScaleYoyo(RectTransform rectTransform, Vector3 startScale, Vector3 peakScale, float duration)

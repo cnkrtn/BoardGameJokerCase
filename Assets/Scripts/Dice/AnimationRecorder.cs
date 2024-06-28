@@ -103,15 +103,15 @@ public class AnimationRecorder : MonoBehaviour
                 objectsToRecord[j].transform.position = position;
                 objectsToRecord[j].transform.rotation = rotation;
 
-                // // Play Sound whenever contact happens
-                // if (recordingDataList[j].recordedAnimation[i].isContactWithArena)
-                // {
-                //     diceManager.diceDataList[j].diceUI.PlaySoundRollLow();
-                // }
-                // if (recordingDataList[j].recordedAnimation[i].isContactWithDice)
-                // {
-                //     diceManager.diceDataList[j].diceUI.PlaySoundRollHigh();
-                // }
+                // Play Sound whenever contact happens
+                if (recordingDataList[j].recordedAnimation[i].isContactWithArena)
+                {
+                    diceManager.diceDataList[j].diceUI.PlaySoundRollLow();
+                }
+                if (recordingDataList[j].recordedAnimation[i].isContactWithDice)
+                {
+                    diceManager.diceDataList[j].diceUI.PlaySoundRollHigh();
+                }
             }
             yield return new WaitForFixedUpdate();
         }

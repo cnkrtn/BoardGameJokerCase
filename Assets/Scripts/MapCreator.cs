@@ -13,7 +13,7 @@ public class MapCreator : MonoBehaviour
     [SerializeField] private GameObject horseTileStraight,horseTileCorner;
     [SerializeField] private GameObject snakeTileStraight,snakeTileCorner;
     [SerializeField] private GameObject emptyTileStraight,emptyTileCorner;
-    [SerializeField] private GameObject startTile;
+    [SerializeField] private GameObject startTile,shopTile;
     [SerializeField] private GameObject unwalkableTile;
 
     private void OnEnable()
@@ -197,7 +197,6 @@ private GameObject SelectPrefab(GridObject gridObject, int index)
         }
     }
 
-    
     if (gridObject.tileTypeIndex == 1)
     {
         if (index != 0 && index != 1)
@@ -233,6 +232,7 @@ private GameObject SelectPrefab(GridObject gridObject, int index)
             return pathStraightPear;
         }
     }
+
     if (gridObject.tileTypeIndex == 4)
     {
         if (index != 0 && index != 1)
@@ -244,6 +244,7 @@ private GameObject SelectPrefab(GridObject gridObject, int index)
             return bearTileStraight;
         }
     }
+
     if (gridObject.tileTypeIndex == 5)
     {
         if (index != 0 && index != 1)
@@ -255,6 +256,7 @@ private GameObject SelectPrefab(GridObject gridObject, int index)
             return horseTileStraight;
         }
     }
+
     if (gridObject.tileTypeIndex == 6)
     {
         if (index != 0 && index != 1)
@@ -269,12 +271,17 @@ private GameObject SelectPrefab(GridObject gridObject, int index)
 
     if (gridObject.tileTypeIndex == 0)
     {
-        
         return startTile;
-        
     }
+
+    if (gridObject.tileTypeIndex == 7)
+    {
+        return shopTile;
+    }
+
     return null;
 }
+
 
 }
 

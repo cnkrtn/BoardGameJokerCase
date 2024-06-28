@@ -47,48 +47,32 @@ public class GridManager : Singleton<GridManager>
         SetBoardElements();
     }
 
- private void SetBoardElements()
+private void SetBoardElements()
 {
     finalPathGameObjects[0].GetComponent<GridObject>().tileTypeIndex = 0;
-    finalPathGameObjects[4].GetComponent<GridObject>().tileTypeIndex = 7;
-    
+
     for (int i = 1; i < waypoints.Count; i++)
     {
-        if (i != 4)
+        var tileObject = GetGameObjectAtGridPosition(waypoints[i]);
+        var tileGridObject = tileObject.GetComponent<GridObject>();
+        switch (i)
         {
-            var tileObject = GetGameObjectAtGridPosition(waypoints[i]);
-            var tileGridObject = tileObject.GetComponent<GridObject>();
-            switch (i)
-            {
-                case 1 or 5:
-                {
-                    tileGridObject.tileTypeIndex = 4;
-
-                    var bearNumber = Random.Range(1, 6);
-                    tileGridObject.fruitCount = bearNumber;
-                    break;
-                }
-                case 2 or 6:
-                {
-                    tileGridObject.tileTypeIndex = 5;
-
-                    var horseNumber = Random.Range(1, 2);
-                    tileGridObject.fruitCount = horseNumber;
-                    break;
-                }
-                case 3 or 7:
-                {
-                    tileGridObject.tileTypeIndex = 6;
-
-                    var snakeNumber = Random.Range(2, 4);
-                    tileGridObject.fruitCount = snakeNumber;
-                    break;
-                }
-            }
+            case 1 or 5:
+                tileGridObject.tileTypeIndex = 4;
+                tileGridObject.fruitCount = Random.Range(1, 6);
+                break;
+            case 2 or 6:
+                tileGridObject.tileTypeIndex = 5;
+                tileGridObject.fruitCount = Random.Range(1, 2);
+                break;
+            case 3 or 7:
+                tileGridObject.tileTypeIndex = 6;
+                tileGridObject.fruitCount = Random.Range(2, 4);
+                break;
+            case 4:
+                tileGridObject.tileTypeIndex = 7;
+                break;
         }
-        
-        
-        
     }
 
     var tileCount = finalPathTiles.Count - waypoints.Count;
@@ -98,8 +82,17 @@ public class GridManager : Singleton<GridManager>
     tilesToModify = tilesToModify.OrderBy(x => Random.value).ToList();
 
     int appleCount = Mathf.RoundToInt(tilesToFill * 0.5f);
-    int pearCount = Mathf.RoundToInt(tilesToFill * 0.333f);
-    int strawberryCount = tilesToFill - appleCount - pearCount;
+    int strawberryCount = Mathf.RoundToInt(tilesToFill * 0.333f);
+    int pearCount = tilesToFill - appleCount - strawberryCount;
+
+    int totalAssignedFruits = appleCount + strawberryCount + pearCount;
+    if (totalAssignedFruits != tilesToFill)
+    {
+        appleCount += (tilesToFill - totalAssignedFruits);
+    }
+
+    // Log the calculated counts for debugging
+    Debug.Log($"Calculated - Apple Count: {appleCount}, Strawberry Count: {strawberryCount}, Pear Count: {pearCount}");
 
     List<int> fruitCounts = new List<int>();
 
@@ -107,16 +100,20 @@ public class GridManager : Singleton<GridManager>
     {
         fruitCounts.Add(1);
     }
-    for (int i = 0; i < pearCount; i++)
+    for (int i = 0; i < strawberryCount; i++)
     {
         fruitCounts.Add(2);
     }
-    for (int i = 0; i < strawberryCount; i++)
+    for (int i = 0; i < pearCount; i++)
     {
         fruitCounts.Add(3);
     }
 
-    fruitCounts = fruitCounts.OrderBy(x => Random.value).ToList();
+  //  fruitCounts = fruitCounts.OrderBy(x => Random.value).ToList();
+
+    int actualAppleCount = 0;
+    int actualStrawberryCount = 0;
+    int actualPearCount = 0;
 
     for (int i = 0; i < tilesToFill; i++)
     {
@@ -127,16 +124,19 @@ public class GridManager : Singleton<GridManager>
         switch (fruitType)
         {
             case 1:
-                fruitNumber = Random.Range(1, 4);
+                fruitNumber = Random.Range(3, 5);
                 tileObject.tileTypeIndex = 1;
+                actualAppleCount++;
                 break;
             case 2:
-                fruitNumber = Random.Range(4, 7);
+                fruitNumber = Random.Range(4, 6);
                 tileObject.tileTypeIndex = 2;
+                actualStrawberryCount++;
                 break;
             case 3:
-                fruitNumber = Random.Range(7, 10);
+                fruitNumber = Random.Range(6, 10);
                 tileObject.tileTypeIndex = 3;
+                actualPearCount++;
                 break;
             default:
                 fruitNumber = 0;
@@ -144,6 +144,7 @@ public class GridManager : Singleton<GridManager>
         }
 
         tileObject.fruitCount = fruitNumber;
+        Debug.Log($"Tile {i}: Type {tileObject.tileTypeIndex}, Count {tileObject.fruitCount}");
     }
 
     for (int i = tilesToFill; i < tilesToModify.Count; i++)
@@ -153,8 +154,15 @@ public class GridManager : Singleton<GridManager>
         tileObject.fruitCount = 0;
     }
 
+    // Log the actual counts for debugging
+    Debug.Log($"Actual - Apple Count: {actualAppleCount}, Strawberry Count: {actualStrawberryCount}, Pear Count: {actualPearCount}");
+
     EventManager.OnTileConfigurationEnd?.Invoke();
 }
+
+
+
+
 
 
     private void GameObjectList()

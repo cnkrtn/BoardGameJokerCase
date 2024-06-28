@@ -13,26 +13,27 @@ public class GameManager : MonoBehaviour
     private static readonly int IsWalking = Animator.StringToHash("isWalking");
     
 
-    private void Start()
+    private void Awake()
     {
-        _currentGridIndex = 0;
+        _currentGridIndex = DataManager.Instance.gridPosition;
+        Debug.Log("Current GridPosition" + " " + _currentGridIndex);
     }
 
     private void OnEnable()
     {
         EventManager.OnMapCreationCompleted += OnMapCreationCompleted;
-        EventManager.OnSimAnimationFinished += OnAnimationFinished;
+        EventManager.OnSimAnimationFinished += OnSimAnimationFinished;
         EventManager.OnStoppedOnACell += OnStoppedOnACell;
     }
 
     private void OnDisable()
     {
         EventManager.OnMapCreationCompleted -= OnMapCreationCompleted;
-        EventManager.OnSimAnimationFinished -= OnAnimationFinished;
+        EventManager.OnSimAnimationFinished -= OnSimAnimationFinished;
         EventManager.OnStoppedOnACell -= OnStoppedOnACell;
     }
 
-    private void OnAnimationFinished(int sum)
+    private void OnSimAnimationFinished(int sum)
     {
         Debug.Log($"OnAnimationFinished triggered with sum: {sum}");
         FindWalkLength(sum);
@@ -89,6 +90,8 @@ private IEnumerator MoveThroughPath(int targetIndex)
         _currentGridIndex = (_currentGridIndex + 1) % GridManager.Instance.finalPathGameObjects.Count;
     }
 
+    DataManager.Instance.gridPosition = _currentGridIndex;
+    DataManager.Instance.SaveData();
     playerAnimator.SetBool(IsWalking, false);
     var gridObject = GridManager.Instance.finalPathGameObjects[_currentGridIndex].GetComponent<GridObject>();
     var fruitCount = gridObject.fruitCount;
@@ -115,7 +118,8 @@ private IEnumerator AdjustPlayerTurns(Vector3 targetDirection)
     private void OnMapCreationCompleted()
     {
         player.SetActive(true);
-        var startTransform = GridManager.Instance.finalPathGameObjects[0].transform;
+        var startTransform = GridManager.Instance.finalPathGameObjects[_currentGridIndex].transform;
+        Debug.Log("Current GridPosition" + " " + _currentGridIndex);
          player.transform.position = startTransform.position;
         // var r0 = new Vector3(0, -90, 0);
         // player.transform.rotation = Quaternion.Euler(r0);
@@ -135,23 +139,13 @@ private IEnumerator AdjustPlayerTurns(Vector3 targetDirection)
                 DataManager.Instance.pearCount += fruitCount;
                 break;
             case 4:
-                var random = Random.Range(0, 3);
-                if (random == 0)
-                {
-                    DataManager.Instance.appleCount -= fruitCount;
-                    Debug.Log("Fruit " +  DataManager.Instance.appleCount);
-                    
-                }else if (random == Random.Range(0, 3))
-                {
-                    DataManager.Instance.strawberryCount -= fruitCount;
-                    Debug.Log("Fruit " +  DataManager.Instance.strawberryCount);
-                }
-                else
-                {
-                    DataManager.Instance.pearCount -= fruitCount;
-                    Debug.Log("Fruit " +  DataManager.Instance.pearCount);
-                }
-              
+                DataManager.Instance.appleCount -= fruitCount;
+                break;
+            case 5:
+                DataManager.Instance.appleCount -= fruitCount;
+                break;
+            case 6:
+                DataManager.Instance.appleCount -= fruitCount;
                 break;
             
         }
