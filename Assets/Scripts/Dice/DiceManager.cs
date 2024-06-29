@@ -75,7 +75,7 @@ public class DiceManager : MonoBehaviour
 
 public void GenerateDice(int count, bool initializeForRoll)
 {
-    Physics.autoSimulation = false; // Temporarily disable physics
+    Physics.simulationMode = SimulationMode.Script; // Temporarily disable physics
 
     // Ensure diceDataList has the correct number of dice
     if (count > diceDataList.Count)
@@ -113,26 +113,26 @@ public void GenerateDice(int count, bool initializeForRoll)
         diceDataList[i].rb.angularVelocity = initializeForRoll ? initial.torque : Vector3.zero;
     }
 
-    Physics.autoSimulation = true; // Re-enable physics
+    Physics.simulationMode = SimulationMode.FixedUpdate; // Re-enable physics
 }
 
 private InitialState SetInitialState()
 {
     float x = planeTransform.position.x + Random.Range(-transform.localScale.x / 2, transform.localScale.x / 2);
-    float y = planeTransform.position.y + 5.0f; // Start 2 units above ground to ensure it falls
+    float y = planeTransform.position.y + 3.0f; // Start 2 units above ground to ensure it falls
     float z = planeTransform.position.z + Random.Range(-transform.localScale.z / 2, transform.localScale.z / 2);
     Vector3 position = new Vector3(x, y, z);
 
     Quaternion rotation = Quaternion.identity; // No initial rotation
 
-    x = Random.Range(0, 25);
-    y = Random.Range(0, 25);
-    z = Random.Range(0, 25);
+    x = Random.Range(0, 15);
+    y = Random.Range(0, 15);
+    z = Random.Range(0, 15);
     Vector3 force = new Vector3(x, -y, z);
 
-    x = Random.Range(0, 50);
-    y = Random.Range(0, 50);
-    z = Random.Range(0, 50);
+    x = Random.Range(0, 40);
+    y = Random.Range(0, 40);
+    z = Random.Range(0, 40);
     Vector3 torque = new Vector3(x, y, z);
 
     return new InitialState(position, rotation, force, torque);

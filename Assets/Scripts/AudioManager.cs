@@ -17,9 +17,20 @@ public class AudioManager : Singleton<AudioManager>
     public AudioSource[] soundSources = new AudioSource[5]; // Array of AudioSources for sound effects
     public Transform soundSourceObject;
 
-    private void Awake()
+    
+
+    protected override void Awake()
     {
         base.Awake();
+        DontDestroyOnLoad(gameObject); // Ensure AudioManager persists across scenes
+
+        // Ensure soundSourceObject is at root level if it is not already
+        if (soundSourceObject.parent != null)
+        {
+            soundSourceObject.parent = null;
+        }
+
+        DontDestroyOnLoad(soundSourceObject.gameObject);
 
         // Add and initialize AudioSource components
         for (int i = 0; i < soundSources.Length; i++)

@@ -2,8 +2,8 @@
 
 public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
-    private static T _instance;
-    private static bool _applicationIsQuitting = false;
+    protected static T _instance;
+    protected static bool _applicationIsQuitting = false;
 
     public static T Instance
     {
@@ -24,6 +24,15 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
                     singletonObject.name = "(singleton) " + typeof(T).ToString();
                     DontDestroyOnLoad(singletonObject);
                 }
+                else
+                {
+                    // Ensure the existing instance is at the root level
+                    if (_instance.gameObject.transform.parent != null)
+                    {
+                        _instance.gameObject.transform.parent = null;
+                        DontDestroyOnLoad(_instance.gameObject);
+                    }
+                }
             }
 
             return _instance;
@@ -40,7 +49,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         if (_instance == null)
         {
             _instance = this as T;
-            DontDestroyOnLoad(gameObject);
+           
         }
         else if (_instance != this)
         {

@@ -28,6 +28,21 @@ public class GridManager : Singleton<GridManager>
     public List<GameObject> finalPathGameObjects;
     public List<GameObject> leftEdgeCells, rightEdgeCells, topEdgeCells, bottomEdgeCells;
     private GameObject bottomLeftCorner, bottomRightCorner, topLeftCorner, topRightCorner;
+    
+
+    protected override void Awake()
+    {
+        if (Instance == null)
+        {
+            _instance = this as GridManager;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        base.Awake(); // Ensure base class logic is executed
+    }
     void Start()
     {
         gridCells = new Dictionary<Vector2Int, GameObject>();
@@ -92,7 +107,7 @@ private void SetBoardElements()
     }
 
     // Log the calculated counts for debugging
-    Debug.Log($"Calculated - Apple Count: {appleCount}, Strawberry Count: {strawberryCount}, Pear Count: {pearCount}");
+//    Debug.Log($"Calculated - Apple Count: {appleCount}, Strawberry Count: {strawberryCount}, Pear Count: {pearCount}");
 
     List<int> fruitCounts = new List<int>();
 
@@ -108,8 +123,7 @@ private void SetBoardElements()
     {
         fruitCounts.Add(3);
     }
-
-  //  fruitCounts = fruitCounts.OrderBy(x => Random.value).ToList();
+//  fruitCounts = fruitCounts.OrderBy(x => Random.value).ToList();
 
     int actualAppleCount = 0;
     int actualStrawberryCount = 0;
@@ -144,7 +158,7 @@ private void SetBoardElements()
         }
 
         tileObject.fruitCount = fruitNumber;
-        Debug.Log($"Tile {i}: Type {tileObject.tileTypeIndex}, Count {tileObject.fruitCount}");
+       
     }
 
     for (int i = tilesToFill; i < tilesToModify.Count; i++)
@@ -153,9 +167,6 @@ private void SetBoardElements()
         tileObject.tileTypeIndex = 10;
         tileObject.fruitCount = 0;
     }
-
-    // Log the actual counts for debugging
-    Debug.Log($"Actual - Apple Count: {actualAppleCount}, Strawberry Count: {actualStrawberryCount}, Pear Count: {actualPearCount}");
 
     EventManager.OnTileConfigurationEnd?.Invoke();
 }

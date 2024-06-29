@@ -30,7 +30,7 @@ public class AnimationManager : MonoBehaviour
         animationCamera.Priority = 11;
         animator.Play("Play");
         StartCoroutine(WaitForAnimationEnd(animator, "Play"));
-        playerAnimator.Play("Happy");
+       
 
         var index = GridManager.Instance.finalPathGameObjects[currentGridIndex].GetComponent<GridObject>().tileTypeIndex;
         
@@ -39,25 +39,32 @@ public class AnimationManager : MonoBehaviour
         {
             case 1:
                 AudioManager.Instance.PlaySound("AppleWin");
+                playerAnimator.Play("Win");
                 break;
             case 2:
                 AudioManager.Instance.PlaySound("StrawberryWin");
+                playerAnimator.Play("Win");
                 break;
             case 3:
                 AudioManager.Instance.PlaySound("PearWin");
+                playerAnimator.Play("Win");
                 break;
             case 4:
                 AudioManager.Instance.PlaySound("AppleLose");
+                playerAnimator.Play("Lose");
                 break;
             case 5:
                 AudioManager.Instance.PlaySound("StrawberryLose");
+                playerAnimator.Play("Lose");
                 
                 break;
             case 6:
                 AudioManager.Instance.PlaySound("PearLose");
+                playerAnimator.Play("Lose");
                 break;
             case 7:
                 AudioManager.Instance.PlaySound("Market");
+                playerAnimator.Play("Win");
                 break;
         }
 

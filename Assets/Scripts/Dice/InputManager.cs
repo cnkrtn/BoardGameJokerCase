@@ -10,10 +10,11 @@ public class InputManager : MonoBehaviour
     public List<TMP_InputField> targetResultInputFields;
     [SerializeField] private List<GameObject> dicePanels;
     [SerializeField] private RectTransform foregroundWoodDicePanelParent, backgroundWoodDicePanelParent;
+    [SerializeField] private List<Sprite> diceFaceSprites;
+    [SerializeField] private List<Image> diceImageSlots;
 
     private void Start()
     {
-        
         diceAmountDropdown.onValueChanged.AddListener(OnDiceAmountChanged);
     }
 
@@ -59,11 +60,10 @@ public class InputManager : MonoBehaviour
         // Force rebuild the layout
         LayoutRebuilder.ForceRebuildLayoutImmediate(backgroundWoodDicePanelParent);
         LayoutRebuilder.ForceRebuildLayoutImmediate(foregroundWoodDicePanelParent);
+
+        // Update dice images based on the new amount
+        UpdateDiceImages();
     }
-
-
-
-
 
     public void UpdateTargetedResult(int index)
     {
@@ -92,6 +92,30 @@ public class InputManager : MonoBehaviour
                 diceManager.targetedResult.Add(DiceManager.Elements.Any); // Default to any face if not set
             }
             diceManager.targetedResult[index] = newTarget;
+        }
+
+        // Update the UI image with the correct sprite
+        UpdateDiceImage(index, faceValue);
+    }
+
+    private void UpdateDiceImages()
+    {
+        for (int i = 0; i < diceManager.targetedResult.Count && i < diceImageSlots.Count; i++)
+        {
+            int faceValue = (int)diceManager.targetedResult[i] + 1;
+            UpdateDiceImage(i, faceValue);
+        }
+    }
+
+    private void UpdateDiceImage(int index, int faceValue)
+    {
+        if (index < diceImageSlots.Count && faceValue >= 1 && faceValue <= 6)
+        {
+            diceImageSlots[index].sprite = diceFaceSprites[faceValue - 1];
+        }
+        else if (index < diceImageSlots.Count)
+        {
+            diceImageSlots[index].sprite = null; // Or set to a default sprite if needed
         }
     }
 }

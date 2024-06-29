@@ -228,8 +228,9 @@ public class UIManager : MonoBehaviour
                 if (buyButtons[2].image.sprite == buttonSprites[1]) return;
                 SetButtonSprite(2, 1, 3);
                 SetButtonSprite(3, 0, 2);
-                break;
                 _valueToRise = 5;
+                break;
+              
 
             case 3:
 

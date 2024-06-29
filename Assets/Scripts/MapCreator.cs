@@ -29,9 +29,6 @@ private void OnTileConfigurationEnd()
 {
     var boardTiles = GridManager.Instance.finalPathTiles;
     var gridCells = GridManager.Instance.gridCells;
-    var gridCenter = GridManager.Instance.GetCenterGridCell().GetComponent<GridObject>().gridPosition;
-    Vector2Int previousDirection=new Vector2Int(1,0);
-    int previousPathTileIndex = 0;
     for (int i = 0; i < boardTiles.Count; i++)
     {
         if (gridCells.TryGetValue(boardTiles[i], out GameObject cell))

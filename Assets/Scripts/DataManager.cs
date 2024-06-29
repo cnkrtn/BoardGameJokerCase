@@ -28,14 +28,17 @@ public class DataManager : Singleton<DataManager>
     public bool musicToggle, soundToggle;
     private string _dataFilePath;
 
-    private void Awake()
+    
+
+    protected override void Awake()
     {
         base.Awake();
+        DontDestroyOnLoad(gameObject); // Ensure DataManager persists across scenes
+
         // Initialize file path for saving data
         _dataFilePath = Path.Combine(Application.persistentDataPath, "gameData.json");
         LoadData();
     }
-
     // Method to save data to JSON
     public void SaveData()
     {
