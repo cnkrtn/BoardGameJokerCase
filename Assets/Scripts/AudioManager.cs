@@ -19,7 +19,7 @@ public class AudioManager : Singleton<AudioManager>
 
     private void Awake()
     {
-        DontDestroyOnLoad(gameObject);
+        base.Awake();
 
         // Add and initialize AudioSource components
         for (int i = 0; i < soundSources.Length; i++)
@@ -88,6 +88,7 @@ public class AudioManager : Singleton<AudioManager>
     public void ToggleMusic()
     {
         musicSource.mute = !musicSource.mute;
+        
     }
 
     public void ToggleSfx()
@@ -95,13 +96,14 @@ public class AudioManager : Singleton<AudioManager>
         foreach (AudioSource source in soundSources)
         {
             source.mute = !source.mute;
+          
         }
     }
 
     public void MusicVolume(float volume)
     {
         musicSource.volume = volume;
-        DataManager.Instance.SaveData();
+    
     }
 
     public void SfxVolume(float volume)
@@ -110,7 +112,7 @@ public class AudioManager : Singleton<AudioManager>
         {
             source.volume = volume;
         }
-        DataManager.Instance.SaveData();
+      
     }
 
     public void FadeOutMusic(float duration)

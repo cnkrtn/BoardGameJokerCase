@@ -17,6 +17,7 @@ public class FadeAnimation : MonoBehaviour
 
     private IEnumerator FadeOutAndChangeScene()
     {
+        
         AudioManager.Instance.FadeOutMusic(3.0f);
 
         yield return new WaitForSeconds(3.5f);

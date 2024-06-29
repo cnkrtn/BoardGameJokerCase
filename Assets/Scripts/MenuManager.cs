@@ -19,6 +19,7 @@ public class MenuManager : MonoBehaviour
     public void NewGameButtonPressed()
     { 
         DataManager.Instance.isNewGame = true;
+        DataManager.Instance.LoadData();
         fadeAnimation.Play("FadeAnimation");
          
     }
@@ -26,6 +27,7 @@ public class MenuManager : MonoBehaviour
     public void ContinueButtonPressed()
     { 
         DataManager.Instance.isNewGame = false;
+        DataManager.Instance.LoadData();
         fadeAnimation.Play("FadeAnimationContinue");
     }
 
@@ -42,6 +44,8 @@ public class MenuManager : MonoBehaviour
         panel.localScale = Vector3.one * .8f;
         StartCoroutine(LerpHelper.LerpScale(panel, panel.localScale, Vector3.zero, .2f,
             LerpHelper.GetEasingFunction(EasingFunctionType.Linear)));
+
+        DataManager.Instance.SaveData();
     }
     
     public void ToggleMusic(){AudioManager.Instance.ToggleMusic();}
@@ -54,6 +58,7 @@ public class MenuManager : MonoBehaviour
         musicSlider.value = DataManager.Instance.musicVolume;
         soundSlider.value = DataManager.Instance.soundVolume;
         musicToggle.isOn = DataManager.Instance.musicToggle;
-        soundToggle.isOn = DataManager.Instance.soundToggle;
+        soundToggle.isOn=DataManager.Instance.soundToggle;
     }
+   
 }

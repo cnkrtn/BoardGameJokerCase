@@ -15,7 +15,6 @@ public class PlayerData
     public float soundVolume;
     public bool musicToggle;
     public bool soundToggle;
-
 }
 
 // Singleton class to manage your data
@@ -26,18 +25,15 @@ public class DataManager : Singleton<DataManager>
     public float soundVolume;
     public int gridPosition;
     public bool isNewGame;
-    public bool musicToggle,soundToggle;
+    public bool musicToggle, soundToggle;
     private string _dataFilePath;
 
     private void Awake()
     {
-        
-        DontDestroyOnLoad(gameObject);
+        base.Awake();
         // Initialize file path for saving data
-        _dataFilePath = Path.Combine(Application.persistentDataPath, "fruitData.json");
+        _dataFilePath = Path.Combine(Application.persistentDataPath, "gameData.json");
         LoadData();
-
-        
     }
 
     // Method to save data to JSON
@@ -60,18 +56,12 @@ public class DataManager : Singleton<DataManager>
         Debug.Log("Data saved to " + _dataFilePath);
     }
 
-    // Method to load data from JSON
+
     public void LoadData()
     {
         if (isNewGame)
         {
-            strawberryCount = 0;
-            appleCount = 0;
-            pearCount = 0;
-            gridPosition = 0;
-            soundVolume = 1;
-            musicVolume = .7f;
-           
+            InitializeNewGameData();
         }
         else
         {
@@ -88,34 +78,41 @@ public class DataManager : Singleton<DataManager>
                 soundVolume = data.soundVolume;
                 musicToggle = data.musicToggle;
                 soundToggle = data.soundToggle;
-                
+
                 Debug.Log("Data loaded from " + _dataFilePath);
             }
             else
             {
                 Debug.LogWarning("Save file not found at " + _dataFilePath);
-                strawberryCount = 0;
-                appleCount = 0;
-                pearCount = 0;
-                gridPosition = 0;
-                soundVolume = 1;
-                musicVolume = .7f;
-                musicToggle = true;
-                soundToggle = true;
-
+                InitializeNewGameData();
             }
         }
     }
 
+    private void InitializeNewGameData()
+    {
+        strawberryCount = 0;
+        appleCount = 0;
+        pearCount = 0;
+        gridPosition = 0;
+        soundVolume = 1;
+        musicVolume = .7f;
+        musicToggle = true;
+        soundToggle = true;
+        SaveData();
+    }
+
     private void OnApplicationPause(bool pauseStatus)
     {
-        SaveData();
+        if (pauseStatus)
+        {
+            SaveData();
+        }
     }
 
     protected override void OnApplicationQuit()
     {
         SaveData();
+        base.OnApplicationQuit();
     }
-    
-    
 }

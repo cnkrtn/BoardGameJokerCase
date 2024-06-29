@@ -385,7 +385,12 @@ public class UIManager : MonoBehaviour
     
     public void ToggleMusic(){AudioManager.Instance.ToggleMusic();}
     public void ToggleSound(){AudioManager.Instance.ToggleSfx();}
-    public void MusicVolume(){AudioManager.Instance.MusicVolume(musicSlider.value);}
+
+    public void MusicVolume()
+    {
+        AudioManager.Instance.MusicVolume(musicSlider.value);
+        
+    }
     public void SfxVolume(){AudioManager.Instance.SfxVolume(soundSlider.value);}
     
     private void SetVolumeSliders()
@@ -399,5 +404,10 @@ public class UIManager : MonoBehaviour
     public void PlaySound(string name)
     {
         AudioManager.Instance.PlaySound(name);
+    }
+
+    public void SaveData()
+    {
+        DataManager.Instance.SaveData();
     }
 }
