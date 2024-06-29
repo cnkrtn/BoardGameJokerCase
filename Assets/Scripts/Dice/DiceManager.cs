@@ -119,7 +119,7 @@ public void GenerateDice(int count, bool initializeForRoll)
 private InitialState SetInitialState()
 {
     float x = planeTransform.position.x + Random.Range(-transform.localScale.x / 2, transform.localScale.x / 2);
-    float y = planeTransform.position.y + 3.0f; // Start 2 units above ground to ensure it falls
+    float y = planeTransform.position.y + 2.0f; // Start 2 units above ground to ensure it falls
     float z = planeTransform.position.z + Random.Range(-transform.localScale.z / 2, transform.localScale.z / 2);
     Vector3 position = new Vector3(x, y, z);
 
@@ -130,9 +130,9 @@ private InitialState SetInitialState()
     z = Random.Range(0, 15);
     Vector3 force = new Vector3(x, -y, z);
 
-    x = Random.Range(0, 40);
-    y = Random.Range(0, 40);
-    z = Random.Range(0, 40);
+    x = Random.Range(0, 20);
+    y = Random.Range(0, 20);
+    z = Random.Range(0, 20);
     Vector3 torque = new Vector3(x, y, z);
 
     return new InitialState(position, rotation, force, torque);
