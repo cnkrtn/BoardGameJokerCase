@@ -23839,7 +23839,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1324326343169789656}
-  - component: {fileID: 5447731373628869347}
   m_Layer: 0
   m_Name: AppleCorenerTile
   m_TagString: Untagged
@@ -23865,18 +23864,6 @@ Transform:
   - {fileID: 7236153035130378440}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5447731373628869347
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3936172957606813684}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22649433caffb1247bf87d557cf7d2c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3943309874818300175
 GameObject:
   m_ObjectHideFlags: 0
@@ -41357,7 +41344,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &8624114738864498840
 Transform:
@@ -44529,7 +44516,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &313615008928818614
 Transform:
@@ -46849,7 +46836,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &918493378518427827
 Transform:
@@ -53338,7 +53325,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &9112316052236089748
 Transform:

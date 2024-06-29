@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class FadeAnimation : MonoBehaviour
 {
+    [SerializeField] private Animator animator;
     public void NewGameButtonPressed()
     {
         StartCoroutine(FadeOutAndChangeScene());
@@ -31,6 +32,10 @@ public class FadeAnimation : MonoBehaviour
     {
         AudioManager.Instance.FadeInMusic(.7f,3.0f);
         
-        
+    }
+
+    public void StartCinematic()
+    {
+        animator.Play("StartCamera");
     }
 }
